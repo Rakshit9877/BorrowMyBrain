@@ -53,8 +53,8 @@ class SessionManager {
 
     mockVideoConnection() {
         // Simulate successful connection for testing
-        this.updateConnectionStatus('connected', 'Mock Session Active - Ready for AI Testing');
-        this.showNotification('Session loaded! Mock transcript ready. Click "Get AI Summary" to test!', 'success');
+    this.updateConnectionStatus('connected', 'Connected');
+    this.showNotification('Session loaded. Click "Get AI Summary" to generate insights.', 'success');
     }
 
     loadMockTranscript() {
