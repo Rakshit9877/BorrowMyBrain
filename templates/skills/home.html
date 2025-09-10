@@ -1,0 +1,690 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borrow My Brain - Micro-Learning Marketplace</title>
+    <meta name="description" content="Trade or sell 15-60 minute micro-sessions of expertise. Flexible exchange models with AI-powered features and QR-verified meetups.">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Top Promotional Banner -->
+    <div class="promo-banner" id="promo-banner">
+        <div class="container">
+            <div class="promo-content">
+                <span class="promo-text">
+                    🎓 <strong>Expand your skills with micro-learning</strong> | Starting at just $15. 
+                    <span class="promo-highlight">Limited time offer!</span>
+                </span>
+                <button class="promo-close" id="promo-close" aria-label="Close banner">×</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <span class="brand-text">BorrowMy<span class="brain-highlight">Brain</span></span>
+            </div>
+            
+            <div class="nav-search">
+                <div class="search-container">
+                    <form action="{% url 'search_results' %}" method="get">
+                        <input type="text" name="q" placeholder="Search for skills, topics, or experts..." class="search-input">
+                        <button class="search-btn" aria-label="Search" type="submit">
+                            <svg width="30" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="{% url 'search_results' %}" class="nav-link">Browse Sessions</a></li>
+                <li><a href="#" class="nav-link">Teach on Platform</a></li>
+                <li><a href="#" class="nav-link">Business</a></li>
+                <li>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'profile' %}" class="btn btn-outline">Profile</a>
+                            <a href="{% url 'create_profile' %}" class="btn btn-primary">Complete Profile</a>
+                            <a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-outline" id="login-btn">Log in</a>
+                            <a href="{% url 'signup' %}" class="btn btn-primary" id="signup-btn">Sign up</a>
+                        {% endif %}
+                    </div>
+                </li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-slider">
+            <div class="hero-slide active">
+                <div class="container">
+                    <div class="hero-content">
+                        <div class="hero-text">
+                            <h1 class="hero-title">
+                                <span class="highlight">Borrow My Brain</span><br>Where Expertise Meets Exchange
+                            </h1>
+                            <p class="hero-subtitle">
+                                Trade or sell micro-sessions of your expertise (15-60 minutes). Pay with money, barter skills, or create hybrid exchanges. Every session powered by advanced AI for intelligent learning.
+                            </p>
+                            <div class="hero-buttons">
+                                <button class="btn btn-primary btn-large">
+                                    Start Trading Skills
+                                </button>
+                                <button class="btn btn-outline btn-large">
+                                    Explore Sessions
+                                </button>
+                            </div>
+                        </div>
+                        <div class="hero-image">
+                            <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=600&h=400&fit=crop" alt="Person learning with AI and technology" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Skills Section -->
+    <section class="popular-skills" id="popular-skills">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <h2>Popular Brain Exchanges</h2>
+                <p>Discover trending skills being traded in our intelligent marketplace</p>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-card orange animate-on-scroll" data-delay="0">
+                    <div class="skill-image">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=200&fit=crop" alt="Full Stack Web Developer" />
+                        <div class="skill-icon">
+                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                                <path d="M13.5 3H7.5C6.11929 3 5 4.11929 5 5.5V18.5C5 19.8807 6.11929 21 7.5 21H16.5C17.8807 21 19 19.8807 19 18.5V9L13.5 3Z" stroke="white" stroke-width="2"/>
+                                <path d="M13.5 3V9H19" stroke="white" stroke-width="2"/>
+                                <path d="M8.5 13.5H15.5M8.5 16.5H12.5" stroke="white" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="skill-content">
+                        <h3>Full Stack Web Developer</h3>
+                        <div class="skill-stats">
+                            <div class="rating">
+                                <span class="star">★</span>
+                                <span class="rating-value">4.7</span>
+                                <span class="rating-count">457K ratings</span>
+                            </div>
+                            <div class="hours">87.8 total hours</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="skill-card purple animate-on-scroll" data-delay="200">
+                    <div class="skill-image">
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=300&h=200&fit=crop" alt="Digital Marketer" />
+                        <div class="skill-icon">
+                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 2L2 7V10C2 16 6 20.5 12 22C18 20.5 22 16 22 10V7L12 2Z" stroke="white" stroke-width="2"/>
+                                <path d="M9 12L11 14L16 9" stroke="white" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="skill-content">
+                        <h3>Digital Marketer</h3>
+                        <div class="skill-stats">
+                            <div class="rating">
+                                <span class="star">★</span>
+                                <span class="rating-value">4.5</span>
+                                <span class="rating-count">3.6K ratings</span>
+                            </div>
+                            <div class="hours">28.4 total hours</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="skill-card pink animate-on-scroll" data-delay="400">
+                    <div class="skill-image">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=200&fit=crop" alt="Data Scientist" />
+                        <div class="skill-icon">
+                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                                <path d="M3 3V9H9V3H3ZM15 3V9H21V3H15ZM3 15V21H9V15H3ZM15 15V21H21V15H15Z" stroke="white" stroke-width="2"/>
+                                <path d="M6 6V6.01M18 6V6.01M6 18V18.01M18 18V18.01" stroke="white" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="skill-content">
+                        <h3>Data Scientist</h3>
+                        <div class="skill-stats">
+                            <div class="rating">
+                                <span class="star">★</span>
+                                <span class="rating-value">4.6</span>
+                                <span class="rating-count">221K ratings</span>
+                            </div>
+                            <div class="hours">47.1 total hours</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="features-list animate-on-scroll" data-delay="600">
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-text">
+                        <h4>Triple Exchange Model</h4>
+                        <p>Pay with cash, barter skills, or create custom hybrid deals</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"></div>
+                    <div class="feature-text">
+                        <h4>AI-Powered Intelligence</h4>
+                        <p>Real-time transcripts, smart summaries, and auto-generated certificates</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-text">
+                        <h4>Smart Micro-Sessions</h4>
+                        <p>Bite-sized 15-60 minute exchanges with QR verification for offline meetups</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2>Your Brain-Sharing Journey</h2>
+                <p>From discovery to mastery in four intelligent steps</p>
+            </div>
+            <div class="steps-container">
+                <div class="step enhanced-step">
+                    <div class="step-icon">🔍</div>
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Discover & Browse</h3>
+                        <p>Explore expertise nearby or worldwide. Use AI-powered matching to find perfect skill exchanges based on your learning goals and teaching abilities.</p>
+                        <div class="step-highlight">Smart filtering by location, price, barter options</div>
+                    </div>
+                </div>
+                <div class="step enhanced-step">
+                    <div class="step-icon">🤝</div>
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Negotiate Exchange</h3>
+                        <p>Choose your preferred model: straight payment, skill barter, or custom hybrid deals. Our platform facilitates seamless negotiations.</p>
+                        <div class="step-highlight">Secure escrow, smart contracts, reputation scores</div>
+                    </div>
+                </div>
+                <div class="step enhanced-step">
+                    <div class="step-icon">🎯</div>
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Connect & Learn</h3>
+                        <p>Join AI-powered sessions with live transcription, or meet locally with QR verification. Every session is intelligently processed for optimal learning.</p>
+                        <div class="step-highlight">AI summaries, auto-certificates, session recordings</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="cta-section" id="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Share Your Brain?</h2>
+                <p>Join thousands of learners and teachers in the world's first intelligent skill-sharing marketplace</p>
+                <div class="cta-buttons">
+                    <button class="btn btn-primary btn-large" id="cta-signup">Get Started Free</button>
+                    <button class="btn btn-outline btn-large" id="cta-login">Already a Member? Log In</button>
+                </div>
+                <div class="cta-features">
+                    <div class="cta-feature">
+                        <span class="cta-icon">🔐</span>
+                        <span>Secure authentication</span>
+                    </div>
+                    <div class="cta-feature">
+                        <span class="cta-icon">⚡</span>
+                        <span>Instant profile creation</span>
+                    </div>
+                    <div class="cta-feature">
+                        <span class="cta-icon">🎯</span>
+                        <span>Smart skill matching</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Sessions -->
+    <section class="featured-sessions">
+        <div class="container">
+            <div class="section-header">
+                <h2>Featured Sessions</h2>
+                <p>Popular micro-learning sessions happening now</p>
+            </div>
+            <div class="sessions-grid" id="sessions-grid">
+                <!-- Session cards will be populated by JavaScript -->
+            </div>
+            <div class="text-center">
+                <button class="btn btn-secondary">View All Sessions</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2>What Our Community Says</h2>
+                <p>Real experiences from learners and teachers</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"I traded my marketing skills for a Python lesson. Amazing platform that truly values skill exchange!"</p>
+                        <div class="rating">★★★★★</div>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50&h=50&fit=crop&crop=face" alt="Sarah Chen" class="avatar">
+                        <div>
+                            <h4>Sarah Chen</h4>
+                            <span>Marketing Manager</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"The AI transcription feature is incredible. I can review everything we covered and get instant summaries."</p>
+                        <div class="rating">★★★★★</div>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face" alt="Mike Rodriguez" class="avatar">
+                        <div>
+                            <h4>Mike Rodriguez</h4>
+                            <span>Software Developer</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"Found a local guitar teacher through the app. The QR verification made meeting up feel completely safe."</p>
+                        <div class="rating">★★★★★</div>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop&crop=face" alt="Emma Thompson" class="avatar">
+                        <div>
+                            <h4>Emma Thompson</h4>
+                            <span>Student</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Career Reimagine Section -->
+    <section class="career-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Ready to reimagine your career?</h2>
+                <p>Get the skills and real-world experience employers want with Career Accelerators.</p>
+            </div>
+            <div class="career-cards">
+                <div class="career-card orange">
+                    <div class="career-icon">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                            <path d="M13.5 3H7.5C6.11929 3 5 4.11929 5 5.5V18.5C5 19.8807 6.11929 21 7.5 21H16.5C17.8807 21 19 19.8807 19 18.5V9L13.5 3Z" stroke="white" stroke-width="2"/>
+                            <path d="M13.5 3V9H19" stroke="white" stroke-width="2"/>
+                            <path d="M8.5 13.5H15.5M8.5 16.5H12.5" stroke="white" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3>Development</h3>
+                    <p>Build websites, apps, and software with hands-on coding sessions</p>
+                </div>
+                <div class="career-card purple">
+                    <div class="career-icon">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L2 7V10C2 16 6 20.5 12 22C18 20.5 22 16 22 10V7L12 2Z" stroke="white" stroke-width="2"/>
+                            <path d="M9 12L11 14L16 9" stroke="white" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3>Design</h3>
+                    <p>Create stunning visuals and user experiences that convert</p>
+                </div>
+                <div class="career-card pink">
+                    <div class="career-icon">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                            <path d="M21 16V8A2 2 0 0019 6H5A2 2 0 003 8V16A2 2 0 005 18H19A2 2 0 0021 16Z" stroke="white" stroke-width="2"/>
+                            <path d="M7 10L12 13L17 10" stroke="white" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3>Business</h3>
+                    <p>Master leadership, strategy, and entrepreneurship skills</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trending Skills Section -->
+    <section class="trending-section">
+        <div class="container">
+            <div class="trending-content">
+                <div class="trending-left">
+                    <h2>Trending Now</h2>
+                    <div class="trending-highlight">
+                        <h3>ChatGPT is a top skill</h3>
+                        <a href="#" class="trending-link">See ChatGPT sessions</a>
+                        <p class="learner-count">4,976,681 learners</p>
+                        <button class="btn btn-outline-purple">Show all trending skills</button>
+                    </div>
+                </div>
+                <div class="trending-right">
+                    <div class="trending-categories">
+                        <h4>Top categories</h4>
+                        <div class="category-column">
+                            <ul>
+                                <li><a href="#">Development</a> <span>(3,927)</span></li>
+                                <li><a href="#">Business</a> <span>(1,105)</span></li>
+                                <li><a href="#">IT and Software</a> <span>(1,572)</span></li>
+                                <li><a href="#">Design</a> <span>(921)</span></li>
+                            </ul>
+                        </div>
+                        <div class="category-column">
+                            <ul>
+                                <li><a href="#">Marketing</a> <span>(812)</span></li>
+                                <li><a href="#">Personal Development</a> <span>(546)</span></li>
+                                <li><a href="#">Photography & Video</a> <span>(317)</span></li>
+                                <li><a href="#">Music</a> <span>(334)</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Company Showcase Section -->
+    <section class="company-showcase">
+        <div class="container">
+            <div class="showcase-content">
+                <div class="showcase-left">
+                    <div class="company-logo">Borrow My Brain | Business</div>
+                    <h2>Borrow My Brain Business Unlocks Talent Retention and Productivity Through Upskilling</h2>
+                    <div class="showcase-stats">
+                        <div class="showcase-stat">
+                            <h3>88%</h3>
+                            <p>of companies that use Borrow My Brain Business report positive ROI</p>
+                        </div>
+                        <div class="showcase-stat">
+                            <h3>77%</h3>
+                            <p>of employees feel more engaged and motivated to learn</p>
+                        </div>
+                    </div>
+                    <div class="cta-buttons">
+                        <button class="btn btn-primary">Request a Demo</button>
+                        <button class="btn btn-outline">Learn More</button>
+                    </div>
+                </div>
+                <div class="showcase-right">
+                    <img src="https://images.unsplash.com/photo-1521737852577-6848d81b9127?w=600&h=400&fit=crop" alt="Team collaborating in an office">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <img src="https://placehold.co/40x40/A435F0/FFFFFF?text=BMB" alt="Borrow My Brain Logo" class="footer-logo-img">
+                        <span class="footer-brand-text">BorrowMy<span class="brain-highlight">Brain</span></span>
+                    </div>
+                    <p class="footer-brand-small">The intelligent skill-sharing marketplace</p>
+                </div>
+                <div class="footer-newsletter">
+                    <h4>Stay Ahead of the Curve</h4>
+                    <p>Subscribe to our newsletter for the latest trends and sessions.</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your email address" class="newsletter-input">
+                        <button type="submit" class="newsletter-btn">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="#">Teach on Platform</a></li>
+                        <li><a href="#">Borrow My Brain Business</a></li>
+                        <li><a href="#">AI Features</a></li>
+                        <li><a href="#">Community</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Help & Support</a></li>
+                        <li><a href="#">Trust & Safety</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Skill-Trading Guide</a></li>
+                        <li><a href="#">Success Stories</a></li>
+                        <li><a href="#">Affiliate Program</a></li>
+                        <li><a href="#">Sitemap</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Get the app</h4>
+                    <a href="#"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" style="width: 120px; margin-bottom: 10px;"></a>
+                    <a href="#"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" style="width: 135px;"></a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="footer-bottom-left">
+                    <div class="footer-logo-small">
+                        <img src="https://placehold.co/30x30/A435F0/FFFFFF?text=BMB" alt="Borrow My Brain Logo">
+                        <span>© 2024 BorrowMyBrain, Inc.</span>
+                    </div>
+                </div>
+                <div class="footer-bottom-right">
+                    <div class="footer-links">
+                        <a href="#">Terms</a>
+                        <a href="#">Privacy</a>
+                        <a href="#">Sitemap</a>
+                    </div>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Facebook"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3V2z"/></svg></a>
+                        <a href="#" aria-label="Twitter"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg></a>
+                        <a href="#" aria-label="LinkedIn"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Book Session Modal -->
+    <div class="modal" id="book-session-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Book a Learning Session</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form class="booking-form">
+                    <div class="form-group">
+                        <label for="skill-search">Skill / Topic</label>
+                        <input type="text" id="skill-search" placeholder="e.g., Python, Guitar, Marketing">
+                    </div>
+                    <div class="form-group">
+                        <label for="session-type">Session Type</label>
+                        <select id="session-type">
+                            <option value="any">Any</option>
+                            <option value="online">Online</option>
+                            <option value="offline">Offline</option>
+                            <option value="hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Find a Brain</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content auth-modal">
+            <div class="modal-header">
+                <h3>Welcome Back</h3>
+                <button class="modal-close" id="login-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form class="auth-form" id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" placeholder="Enter your password" required>
+                    </div>
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="remember"> Remember me
+                        </label>
+                        <a href="#" class="forgot-password">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary auth-submit">Log In</button>
+                </form>
+                
+                <div class="auth-divider">
+                    <span>or continue with</span>
+                </div>
+                
+                <div class="social-login">
+                    <button class="btn-social btn-google">
+                        <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google">
+                        Google
+                    </button>
+                    <button class="btn-social btn-linkedin">
+                        <img src="https://www.svgrepo.com/show/448234/linkedin.svg" alt="LinkedIn">
+                        LinkedIn
+                    </button>
+                </div>
+                
+                <p class="auth-switch">
+                    Don't have an account? <a href="#" class="switch-to-signup">Sign up</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div class="modal" id="signup-modal">
+        <div class="modal-content auth-modal">
+            <div class="modal-header">
+                <h3>Join BorrowMyBrain</h3>
+                <button class="modal-close" id="signup-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form class="auth-form" id="signup-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="signup-first-name">First Name</label>
+                            <input type="text" id="signup-first-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-last-name">Last Name</label>
+                            <input type="text" id="signup-last-name" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" placeholder="Create a strong password" required>
+                        <div class="password-requirements">
+                            <small>8+ characters, 1 uppercase, 1 number</small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-confirm-password">Confirm Password</label>
+                        <input type="password" id="signup-confirm-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-type">I want to:</label>
+                        <select id="user-type" required>
+                            <option value="learn">Learn new skills</option>
+                            <option value="teach">Teach my skills</option>
+                            <option value="both">Both learn and teach</option>
+                        </select>
+                    </div>
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="agreeTerms" required> I agree to the <a href="#">Terms of Service</a>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary auth-submit">Create Account</button>
+                </form>
+                
+                <div class="auth-divider">
+                    <span>or sign up with</span>
+                </div>
+                
+                <div class="social-login">
+                    <button class="btn-social btn-google">
+                        <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google">
+                        Google
+                    </button>
+                    <button class="btn-social btn-linkedin">
+                        <img src="https://www.svgrepo.com/show/448234/linkedin.svg" alt="LinkedIn">
+                        LinkedIn
+                    </button>
+                </div>
+                
+                <p class="auth-switch">
+                    Already have an account? <a href="#" class="switch-to-login">Log in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

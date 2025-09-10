@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Request Skill - BorrowMyBrain{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="contact-form-container">
+        <div class="form-header">
+            <h1>Request a Skill</h1>
+            <p class="lead">Connect with the educator and start your learning journey</p>
+        </div>
+        
+        <div class="educator-summary card">
+            <div class="educator-info">
+                {% if teachable_skill.user_profile.profile_picture %}
+                    <img src="{{ teachable_skill.user_profile.profile_picture.url }}" 
+                         alt="{{ teachable_skill.user_profile.user.get_full_name }}" 
+                         class="profile-img profile-img-medium">
+                {% else %}
+                    <div class="profile-placeholder profile-img-medium">
+                        {{ teachable_skill.user_profile.user.first_name.0|default:teachable_skill.user_profile.user.username.0|upper }}
+                    </div>
+                {% endif %}
+                
+                <div class="educator-details">
+                    <h3>{{ teachable_skill.user_profile.user.get_full_name|default:teachable_skill.user_profile.user.username }}</h3>
+                    <p class="skill-name">{{ teachable_skill.skill.name }}</p>
+                    <span class="proficiency-badge">{{ teachable_skill.proficiency_level|title }}</span>
+                </div>
+            </div>
+            
+            {% if teachable_skill.user_profile.hourly_rate %}
+                <div class="rate-info">
+                    <span class="rate">₹{{ teachable_skill.user_profile.hourly_rate }}/hr</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="contact-options">
+            <div class="option-tabs">
+                <button class="tab-btn active" data-tab="payment" id="payment-tab">
+                    <i class="fas fa-credit-card"></i> Payment Offer
+                </button>
+                <button class="tab-btn" data-tab="exchange" id="exchange-tab">
+                    <i class="fas fa-exchange-alt"></i> Skill Exchange
+                </button>
+            </div>
+
+            <!-- Payment Form -->
+            <div class="tab-content active" id="payment-content">
+                <form method="post" class="contact-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="request_type" value="payment">
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-money-bill-wave"></i> Offered Amount (₹)
+                        </label>
+                        <input type="number" 
+                               name="offered_amount" 
+                               class="form-input" 
+                               step="0.01" 
+                               min="0" 
+                               value="{{ teachable_skill.user_profile.hourly_rate|default:'' }}"
+                               placeholder="Enter your offer" 
+                               required>
+                        {% if teachable_skill.user_profile.hourly_rate %}
+                            <small class="form-hint">
+                                Suggested rate: ₹{{ teachable_skill.user_profile.hourly_rate }}/hour
+                            </small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-comment"></i> Message to Educator
+                        </label>
+                        <textarea name="message" 
+                                  class="form-textarea" 
+                                  rows="5" 
+                                  placeholder="Tell the educator about your learning goals, preferred schedule, and any specific requirements..."
+                                  required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-large">
+                        <i class="fas fa-paper-plane"></i> Send Payment Offer
+                    </button>
+                </form>
+            </div>
+
+            <!-- Exchange Form -->
+            <div class="tab-content" id="exchange-content">
+                <form method="post" class="contact-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="request_type" value="exchange">
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-tools"></i> Skill You're Offering
+                        </label>
+                        <input type="text" 
+                               name="offered_skill" 
+                               class="form-input" 
+                               placeholder="e.g., Web Design, Spanish Language, Guitar Playing..."
+                               required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-medal"></i> Your Experience Level
+                        </label>
+                        <select name="experience_level" class="form-select" required>
+                            <option value="">Select your level</option>
+                            <option value="beginner">Beginner (1-2 years)</option>
+                            <option value="intermediate">Intermediate (3-5 years)</option>
+                            <option value="advanced">Advanced (5+ years)</option>
+                            <option value="expert">Expert (10+ years)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-comment"></i> Message to Educator
+                        </label>
+                        <textarea name="message" 
+                                  class="form-textarea" 
+                                  rows="5" 
+                                  placeholder="Describe your skill, experience, and what you'd like to learn in return. Include any relevant portfolio links or credentials..."
+                                  required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-secondary btn-large">
+                        <i class="fas fa-handshake"></i> Propose Skill Exchange
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.contact-form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.form-header h1 {
+    color: var(--primary-black);
+    margin-bottom: 0.5rem;
+}
+
+.educator-summary {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.educator-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.educator-details h3 {
+    margin: 0 0 0.25rem 0;
+    color: var(--primary-black);
+}
+
+.skill-name {
+    color: var(--primary-purple);
+    font-weight: 600;
+    margin: 0.25rem 0;
+}
+
+.rate-info {
+    text-align: right;
+}
+
+.rate {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-purple);
+}
+
+.option-tabs {
+    display: flex;
+    margin-bottom: 2rem;
+    background: var(--light-gray);
+    border-radius: var(--radius-lg);
+    padding: 0.5rem;
+}
+
+.tab-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: all var(--transition-normal);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.tab-btn.active {
+    background: white;
+    color: var(--primary-purple);
+    box-shadow: var(--shadow-sm);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.contact-form {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: 0.5rem;
+}
+
+.form-label i {
+    color: var(--primary-purple);
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    transition: all var(--transition-normal);
+    font-family: inherit;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+    border-color: var(--primary-purple);
+    box-shadow: 0 0 0 3px rgba(164, 53, 240, 0.1);
+    outline: none;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-hint {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--dark-gray);
+    font-size: 0.9rem;
+}
+
+.btn-large {
+    width: 100%;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+    .educator-summary {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .rate-info {
+        text-align: center;
+    }
+    
+    .tab-btn {
+        font-size: 0.9rem;
+        padding: 0.75rem;
+    }
+    
+    .contact-form {
+        padding: 1.5rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetTab = this.dataset.tab;
+            
+            // Update active tab button
+            tabBtns.forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update active content
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === `${targetTab}-content`) {
+                    content.classList.add('active');
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

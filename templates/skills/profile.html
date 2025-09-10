@@ -1,0 +1,464 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - BorrowMyBrain{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="profile-header">
+        <h1><i class="fas fa-user-circle"></i> My Profile</h1>
+        <p class="text-muted">Manage your profile and the skills you offer</p>
+    </div>
+
+    <div class="profile-content">
+        <!-- Profile Overview -->
+        <div class="profile-overview card mb-4">
+            <div class="card-header">
+                <h3>Profile Overview</h3>
+            </div>
+            <div class="card-body">
+                <div class="profile-summary d-flex align-center gap-4">
+                    {% if user_profile.profile_picture %}
+                        <img src="{{ user_profile.profile_picture.url }}" 
+                             alt="{{ user.get_full_name }}" 
+                             class="profile-img profile-img-large">
+                    {% else %}
+                        <div class="profile-placeholder-large">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="profile-info">
+                        <h2>{{ user.get_full_name|default:user.username }}</h2>
+                        <p class="text-muted">{{ user.email }}</p>
+                        {% if user_profile.location %}
+                            <p><i class="fas fa-map-marker-alt"></i> {{ user_profile.location }}</p>
+                        {% endif %}
+                        {% if user_profile.general_teaching_hours %}
+                            <p><i class="fas fa-clock"></i> Available: {{ user_profile.general_teaching_hours }}</p>
+                        {% endif %}
+                        <div class="profile-stats d-flex gap-4 mt-3">
+                            <div class="stat">
+                                <strong>{{ user_profile.total_students }}</strong>
+                                <span class="text-muted">Students</span>
+                            </div>
+                            <div class="stat">
+                                <strong>{{ user_profile.total_lessons }}</strong>
+                                <span class="text-muted">Lessons</span>
+                            </div>
+                            <div class="stat">
+                                <strong>{{ user_profile.rating }}</strong>
+                                <span class="text-muted">Rating</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-actions mt-4">
+                    <button class="btn btn-primary" onclick="editProfile()">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Basic Information Form (Hidden by default) -->
+        <div id="profile-form" class="card mb-4 d-none">
+            <div class="card-header">
+                <h3>Edit Profile Information</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-row d-flex gap-3">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" name="first_name" 
+                                   value="{{ user.first_name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" name="last_name" 
+                                   value="{{ user.last_name }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Profile Picture</label>
+                        <input type="file" class="form-control" name="profile_picture" accept="image/*">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Bio</label>
+                        <textarea class="form-control" name="bio" rows="4" 
+                                  placeholder="Tell others about yourself...">{{ user_profile.bio }}</textarea>
+                    </div>
+                    
+                    <div class="form-row d-flex gap-3">
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" name="phone_number" 
+                                   value="{{ user_profile.phone_number }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" name="date_of_birth" 
+                                   value="{{ user_profile.date_of_birth|date:'Y-m-d' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-control" name="location" 
+                               value="{{ user_profile.location }}" placeholder="City, Country">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">General Teaching Hours</label>
+                        <input type="text" class="form-control" name="general_teaching_hours" 
+                               value="{{ user_profile.general_teaching_hours }}" 
+                               placeholder="e.g., Weekdays 6-9 PM, Weekends 10 AM - 6 PM">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Hourly Rate (₹)</label>
+                        <input type="number" class="form-control" name="hourly_rate" 
+                               value="{{ user_profile.hourly_rate }}" step="0.01" min="0">
+                    </div>
+                    
+                    <div class="form-actions d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelEdit()">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Teachable Skills Section -->
+        <div class="teachable-skills card mb-4">
+            <div class="card-header d-flex justify-between align-center">
+                <h3>Teachable Skills</h3>
+                <button class="btn btn-primary btn-small" onclick="addSkill()">
+                    <i class="fas fa-plus"></i> Add Skill
+                </button>
+            </div>
+            <div class="card-body">
+                {% if teachable_skills %}
+                    <div class="skills-list">
+                        {% for skill in teachable_skills %}
+                        <div class="skill-item d-flex justify-between align-center p-3 mb-2">
+                            <div class="skill-details">
+                                <h4>{{ skill.skill.name }}</h4>
+                                <p class="text-muted mb-1">{{ skill.proficiency_level|title }} • {{ skill.experience_years }} years experience</p>
+                                {% if skill.description %}
+                                    <p class="skill-desc">{{ skill.description|truncatewords:20 }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="skill-actions">
+                                <button class="btn btn-secondary btn-small">Edit</button>
+                                <button class="btn btn-danger btn-small">Remove</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state text-center p-4">
+                        <i class="fas fa-graduation-cap text-muted" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3">No skills added yet</h4>
+                        <p class="text-muted">Add skills you can teach to start sharing your knowledge</p>
+                        <button class="btn btn-primary mt-2" onclick="addSkill()">
+                            Add Your First Skill
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Add Skill Form (Hidden by default) -->
+        <div id="skill-form" class="card mb-4 d-none">
+            <div class="card-header">
+                <h3>Add Teachable Skill</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label">Skill</label>
+                        <select class="form-control form-select" name="skill" required>
+                            <option value="">Select a skill</option>
+                            <option value="python">Python Programming</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="react">React</option>
+                            <option value="django">Django</option>
+                            <option value="machine-learning">Machine Learning</option>
+                            <option value="data-science">Data Science</option>
+                            <option value="english">English Language</option>
+                            <option value="spanish">Spanish Language</option>
+                            <option value="guitar">Guitar</option>
+                            <option value="piano">Piano</option>
+                            <option value="cooking">Cooking</option>
+                            <option value="photography">Photography</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row d-flex gap-3">
+                        <div class="form-group">
+                            <label class="form-label">Proficiency Level</label>
+                            <select class="form-control form-select" name="proficiency_level" required>
+                                <option value="">Select level</option>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                                <option value="expert">Expert</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Years of Experience</label>
+                            <input type="number" class="form-control" name="experience_years" 
+                                   min="0" max="50" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3" 
+                                  placeholder="Describe your expertise in this skill..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Skill
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelAddSkill()">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Certifications Section -->
+        <div class="certifications card">
+            <div class="card-header d-flex justify-between align-center">
+                <h3>Certifications</h3>
+                <button class="btn btn-primary btn-small" onclick="addCertification()">
+                    <i class="fas fa-certificate"></i> Add Certification
+                </button>
+            </div>
+            <div class="card-body">
+                {% if certifications %}
+                    <div class="certifications-list">
+                        {% for cert in certifications %}
+                        <div class="cert-item d-flex justify-between align-center p-3 mb-2">
+                            <div class="cert-details">
+                                <h4>{{ cert.title }}</h4>
+                                <p class="text-muted">{{ cert.issuing_organization }} • {{ cert.issue_date|date:"M Y" }}</p>
+                                {% if cert.description %}
+                                    <p class="cert-desc">{{ cert.description|truncatewords:15 }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="cert-actions">
+                                {% if cert.certificate_file %}
+                                    <a href="{{ cert.certificate_file.url }}" class="btn btn-secondary btn-small" target="_blank">
+                                        <i class="fas fa-download"></i> View
+                                    </a>
+                                {% endif %}
+                                <button class="btn btn-danger btn-small">Remove</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state text-center p-4">
+                        <i class="fas fa-certificate text-muted" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3">No certifications added yet</h4>
+                        <p class="text-muted">Add your certifications to build credibility</p>
+                        <button class="btn btn-primary mt-2" onclick="addCertification()">
+                            Add Your First Certification
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Add Certification Form (Hidden by default) -->
+        <div id="certification-form" class="card mt-4 d-none">
+            <div class="card-header">
+                <h3>Add Certification</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label">Certification Title</label>
+                        <input type="text" class="form-control" name="title" required 
+                               placeholder="e.g., AWS Certified Developer">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Issuing Organization</label>
+                        <input type="text" class="form-control" name="issuing_organization" required 
+                               placeholder="e.g., Amazon Web Services">
+                    </div>
+                    
+                    <div class="form-row d-flex gap-3">
+                        <div class="form-group">
+                            <label class="form-label">Issue Date</label>
+                            <input type="date" class="form-control" name="issue_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Expiry Date (Optional)</label>
+                            <input type="date" class="form-control" name="expiry_date">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Certificate File (Optional)</label>
+                        <input type="file" class="form-control" name="certificate_file" 
+                               accept=".pdf,.jpg,.jpeg,.png">
+                        <small class="text-muted">Upload PDF, JPG, or PNG files</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3" 
+                                  placeholder="Describe what this certification covers..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Certification
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelAddCertification()">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-header {
+    margin-bottom: 2rem;
+}
+
+.profile-placeholder-large {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: var(--light-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dark-gray);
+    font-size: 4rem;
+}
+
+.profile-stats {
+    margin-top: 1rem;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.stat strong {
+    font-size: 1.5rem;
+    color: var(--primary-purple);
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.skill-item, .cert-item {
+    border: 1px solid var(--light-gray);
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.skill-item:hover, .cert-item:hover {
+    background-color: #e9ecef;
+}
+
+.skill-desc, .cert-desc {
+    margin: 0;
+    color: var(--dark-gray);
+    font-size: 0.9rem;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+@media (max-width: 768px) {
+    .profile-summary {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .form-row {
+        flex-direction: column;
+    }
+    
+    .skill-item, .cert-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .skill-actions, .cert-actions {
+        margin-top: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function editProfile() {
+    document.getElementById('profile-form').classList.remove('d-none');
+    document.querySelector('.profile-overview').scrollIntoView();
+}
+
+function cancelEdit() {
+    document.getElementById('profile-form').classList.add('d-none');
+}
+
+function addSkill() {
+    document.getElementById('skill-form').classList.remove('d-none');
+    document.getElementById('skill-form').scrollIntoView();
+}
+
+function cancelAddSkill() {
+    document.getElementById('skill-form').classList.add('d-none');
+}
+
+function addCertification() {
+    document.getElementById('certification-form').classList.remove('d-none');
+    document.getElementById('certification-form').scrollIntoView();
+}
+
+function cancelAddCertification() {
+    document.getElementById('certification-form').classList.add('d-none');
+}
+</script>
+{% endblock %}

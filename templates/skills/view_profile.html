@@ -1,0 +1,766 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ user_profile.user.get_full_name|default:user_profile.user.username }} - BorrowMyBrain{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Profile Header -->
+    <div class="profile-header-section">
+        <div class="profile-banner">
+            <div class="profile-main d-flex align-center gap-4">
+                {% if user_profile.profile_picture %}
+                    <img src="{{ user_profile.profile_picture.url }}" 
+                         alt="{{ user_profile.user.get_full_name }}" 
+                         class="profile-img profile-img-xl">
+                {% else %}
+                    <div class="profile-placeholder-xl">
+                        <i class="fas fa-user"></i>
+                    </div>
+                {% endif %}
+                
+                <div class="profile-info">
+                    <h1 class="educator-name">
+                        {{ user_profile.user.get_full_name|default:user_profile.user.username }}
+                    </h1>
+                    
+                    {% if user_profile.location %}
+                        <p class="location">
+                            <i class="fas fa-map-marker-alt"></i> {{ user_profile.location }}
+                        </p>
+                    {% endif %}
+                    
+                    <div class="rating-section">
+                        {% if user_profile.rating > 0 %}
+                            <div class="rating">
+                                <span class="stars">
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= user_profile.rating %}
+                                            ★
+                                        {% else %}
+                                            ☆
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                                <span class="rating-text">({{ user_profile.rating }} rating)</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="educator-stats d-flex gap-4 mt-3">
+                        <div class="stat">
+                            <strong>{{ user_profile.total_students }}</strong>
+                            <span class="text-muted">Students</span>
+                        </div>
+                        <div class="stat">
+                            <strong>{{ user_profile.total_lessons }}</strong>
+                            <span class="text-muted">Lessons</span>
+                        </div>
+                        <div class="stat">
+                            <strong>{{ teachable_skills.count }}</strong>
+                            <span class="text-muted">Skills</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-pricing">
+                    {% if user_profile.hourly_rate %}
+                        <div class="hourly-rate-display">
+                            <span class="rate-label">Starting at</span>
+                            <span class="rate-amount">₹{{ user_profile.hourly_rate }}</span>
+                            <span class="rate-period">/hour</span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="quick-actions mt-3">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'make_skill_request' user_profile.teachable_skills.first.id %}" class="btn btn-primary">
+                                <i class="fas fa-envelope"></i> Contact Educator
+                            </a>
+                        {% else %}
+                            <a href="{% url 'login_signup' %}" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt"></i> Login to Contact
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="profile-content mt-4">
+        <div class="content-grid">
+            <!-- Left Column -->
+            <div class="left-column">
+                <!-- About Section -->
+                {% if user_profile.bio %}
+                <div class="about-section card mb-4">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user"></i> About {{ user_profile.user.first_name|default:user_profile.user.username }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="bio-text">{{ user_profile.bio }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Skills Section -->
+                <div class="skills-section card mb-4">
+                    <div class="card-header">
+                        <h3><i class="fas fa-graduation-cap"></i> Skills I Teach</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if teachable_skills %}
+                            <div class="skills-list">
+                                {% for skill in teachable_skills %}
+                                <div class="skill-item">
+                                    <div class="skill-header d-flex justify-between align-center">
+                                        <div class="skill-main">
+                                            <h4 class="skill-name">{{ skill.skill.name }}</h4>
+                                            <div class="skill-meta">
+                                                <span class="proficiency-badge">{{ skill.proficiency_level|title }}</span>
+                                                <span class="experience-text">{{ skill.experience_years }} years experience</span>
+                                            </div>
+                                        </div>
+                                        <div class="skill-actions">
+                                            {% if user.is_authenticated %}
+                                                <a href="{% url 'make_skill_request' skill.id %}" class="btn btn-primary btn-small">
+                                                    <i class="fas fa-plus"></i> Request
+                                                </a>
+                                            {% else %}
+                                                <a href="{% url 'login_signup' %}" class="btn btn-primary btn-small">
+                                                    <i class="fas fa-sign-in-alt"></i> Login
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% if skill.description %}
+                                        <p class="skill-description">{{ skill.description }}</p>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No skills listed yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Certifications Section -->
+                {% if certifications %}
+                <div class="certifications-section card mb-4">
+                    <div class="card-header">
+                        <h3><i class="fas fa-certificate"></i> Certifications</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="certifications-list">
+                            {% for cert in certifications %}
+                            <div class="certification-item">
+                                <div class="cert-header d-flex justify-between align-center">
+                                    <div class="cert-main">
+                                        <h4 class="cert-title">{{ cert.title }}</h4>
+                                        <p class="cert-org">{{ cert.issuing_organization }}</p>
+                                        <p class="cert-date text-muted">
+                                            {{ cert.issue_date|date:"M Y" }}
+                                            {% if cert.expiry_date %}
+                                                - {{ cert.expiry_date|date:"M Y" }}
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    {% if cert.certificate_file %}
+                                        <div class="cert-actions">
+                                            <a href="{{ cert.certificate_file.url }}" 
+                                               class="btn btn-secondary btn-small" target="_blank">
+                                                <i class="fas fa-external-link-alt"></i> View
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% if cert.description %}
+                                    <p class="cert-description">{{ cert.description }}</p>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <!-- Availability Section -->
+                {% if user_profile.general_teaching_hours %}
+                <div class="availability-section card mb-4">
+                    <div class="card-header">
+                        <h3><i class="fas fa-clock"></i> Availability</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="availability-text">{{ user_profile.general_teaching_hours }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Contact Information -->
+                <div class="contact-section card mb-4">
+                    <div class="card-header">
+                        <h3><i class="fas fa-envelope"></i> Get in Touch</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">Interested in learning from {{ user_profile.user.first_name|default:user_profile.user.username }}?</p>
+                        
+                        <div class="contact-options">
+                            <button class="btn btn-primary w-100 mb-2" onclick="showPaymentOffer()">
+                                <i class="fas fa-money-bill"></i> Make Payment Offer
+                            </button>
+                            <button class="btn btn-secondary w-100" onclick="showSkillExchange()">
+                                <i class="fas fa-exchange-alt"></i> Propose Skill Exchange
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="stats-section card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-bar"></i> Stats</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <strong>{{ user_profile.total_students }}</strong>
+                                <span>Total Students</span>
+                            </div>
+                            <div class="stat-item">
+                                <strong>{{ user_profile.total_lessons }}</strong>
+                                <span>Lessons Taught</span>
+                            </div>
+                            <div class="stat-item">
+                                <strong>{{ teachable_skills.count }}</strong>
+                                <span>Skills Offered</span>
+                            </div>
+                            <div class="stat-item">
+                                <strong>{{ certifications.count }}</strong>
+                                <span>Certifications</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-header-section {
+    margin-bottom: 2rem;
+}
+
+.profile-banner {
+    background: linear-gradient(135deg, var(--primary-purple) 0%, #8e2ec4 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+}
+
+.profile-img-xl {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+}
+
+.profile-placeholder-xl {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 4rem;
+    border: 4px solid white;
+}
+
+.educator-name {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.location {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.educator-stats {
+    margin-top: 1rem;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat strong {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.profile-pricing {
+    text-align: right;
+}
+
+.hourly-rate-display {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.rate-label {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.rate-amount {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0.25rem 0;
+}
+
+.rate-period {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+.skill-item, .certification-item {
+    border: 1px solid var(--light-gray);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    background-color: #f8f9fa;
+}
+
+.skill-name, .cert-title {
+    margin: 0;
+    color: var(--primary-purple);
+    font-size: 1.2rem;
+}
+
+.skill-meta {
+    margin-top: 0.5rem;
+}
+
+.proficiency-badge {
+    background-color: var(--primary-purple);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.experience-text {
+    color: var(--dark-gray);
+    font-size: 0.9rem;
+    margin-left: 1rem;
+}
+
+.skill-description, .cert-description {
+    margin-top: 1rem;
+    color: var(--dark-gray);
+    line-height: 1.5;
+}
+
+.cert-org {
+    margin: 0.25rem 0;
+    font-weight: 600;
+    color: var(--dark-gray);
+}
+
+.cert-date {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.stat-item strong {
+    display: block;
+    font-size: 1.5rem;
+    color: var(--primary-purple);
+}
+
+.stat-item span {
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+}
+
+@media (max-width: 768px) {
+    .profile-main {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .profile-pricing {
+        text-align: center;
+        margin-top: 1rem;
+    }
+    
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .skill-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .educator-stats {
+        justify-content: space-around;
+    }
+}
+</style>
+{% endblock %}
+
+<style>
+.profile-header-section {
+    margin-bottom: 2rem;
+}
+
+.profile-banner {
+    background: linear-gradient(135deg, var(--primary-purple) 0%, #8e2ec4 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+}
+
+.profile-img-xl {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+}
+
+.profile-placeholder-xl {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 4rem;
+    border: 4px solid white;
+}
+
+.educator-name {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.location {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.educator-stats {
+    margin-top: 1rem;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat strong {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.profile-pricing {
+    text-align: right;
+}
+
+.hourly-rate-display {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.rate-label {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.rate-amount {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0.25rem 0;
+}
+
+.rate-period {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+.skill-item, .certification-item {
+    border: 1px solid var(--light-gray);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    background-color: #f8f9fa;
+}
+
+.skill-name, .cert-title {
+    margin: 0;
+    color: var(--primary-purple);
+    font-size: 1.2rem;
+}
+
+.skill-meta {
+    margin-top: 0.5rem;
+}
+
+.proficiency-badge {
+    background-color: var(--primary-purple);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.experience-text {
+    color: var(--dark-gray);
+    font-size: 0.9rem;
+    margin-left: 1rem;
+}
+
+.skill-description, .cert-description {
+    margin-top: 1rem;
+    color: var(--dark-gray);
+    line-height: 1.5;
+}
+
+.cert-org {
+    margin: 0.25rem 0;
+    font-weight: 600;
+    color: var(--dark-gray);
+}
+
+.cert-date {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.stat-item strong {
+    display: block;
+    font-size: 1.5rem;
+    color: var(--primary-purple);
+}
+
+.stat-item span {
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--light-gray);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--primary-black);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--dark-gray);
+}
+
+.modal-close:hover {
+    color: var(--primary-black);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .profile-main {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .profile-pricing {
+        text-align: center;
+        margin-top: 1rem;
+    }
+    
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .skill-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .educator-stats {
+        justify-content: space-around;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showContactForm() {
+    document.getElementById('contact-modal').classList.remove('d-none');
+}
+
+function showPaymentOffer() {
+    document.getElementById('modal-title').textContent = 'Make Payment Offer';
+    document.getElementById('payment-offer-form').classList.remove('d-none');
+    document.getElementById('skill-exchange-form').classList.add('d-none');
+    showContactForm();
+}
+
+function showSkillExchange() {
+    document.getElementById('modal-title').textContent = 'Propose Skill Exchange';
+    document.getElementById('payment-offer-form').classList.add('d-none');
+    document.getElementById('skill-exchange-form').classList.remove('d-none');
+    showContactForm();
+}
+
+function closeModal() {
+    document.getElementById('contact-modal').classList.add('d-none');
+    document.getElementById('payment-offer-form').classList.add('d-none');
+    document.getElementById('skill-exchange-form').classList.add('d-none');
+}
+
+function requestSkill(skillId, skillName) {
+    // You can customize this to pre-fill the modal with specific skill
+    showPaymentOffer();
+}
+
+// Close modal when clicking outside
+document.getElementById('contact-modal').addEventListener('click', function(event) {
+    if (event.target === this) {
+        closeModal();
+    }
+});
+
+// Close modal on escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeModal();
+    }
+});
+</script>
+{% endblock %}

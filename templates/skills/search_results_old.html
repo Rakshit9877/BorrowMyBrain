@@ -1,0 +1,466 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Results - BorrowMyBrain{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Search Header -->
+    <div class="search-header">
+        <h1>
+            {% if query %}
+                Search Results for "{{ query }}"
+            {% else %}
+                Browse All Skills
+            {% endif %}
+        </h1>
+        <p class="text-muted">
+            Found {{ educators.count }} educator{{ educators.count|pluralize }} 
+            {% if query %}for your search{% endif %}
+        </p>
+    </div>
+
+    <!-- Search Filters -->
+    <div class="search-filters card mb-4">
+        <div class="card-body">
+            <form method="GET" class="filter-form">
+                <div class="filter-row d-flex gap-3 align-center">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="q" 
+                               placeholder="Search skills or educators..." 
+                               value="{{ query }}">
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control form-select" name="skill">
+                            <option value="">All Skills</option>
+                            <option value="python" {% if skill_filter == 'python' %}selected{% endif %}>Python</option>
+                            <option value="javascript" {% if skill_filter == 'javascript' %}selected{% endif %}>JavaScript</option>
+                            <option value="react" {% if skill_filter == 'react' %}selected{% endif %}>React</option>
+                            <option value="django" {% if skill_filter == 'django' %}selected{% endif %}>Django</option>
+                            <option value="machine-learning" {% if skill_filter == 'machine-learning' %}selected{% endif %}>Machine Learning</option>
+                            <option value="english" {% if skill_filter == 'english' %}selected{% endif %}>English</option>
+                            <option value="guitar" {% if skill_filter == 'guitar' %}selected{% endif %}>Guitar</option>
+                            <option value="cooking" {% if skill_filter == 'cooking' %}selected{% endif %}>Cooking</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Grid -->
+    {% if educators %}
+        <div class="educators-grid grid grid-2">
+            {% for educator in educators %}
+            <div class="educator-card card">
+                <div class="card-body">
+                    <!-- Educator Header -->
+                    <div class="educator-header d-flex align-center gap-3 mb-3">
+                        {% if educator.user_profile.profile_picture %}
+                            <img src="{{ educator.user_profile.profile_picture.url }}" 
+                                 alt="{{ educator.user_profile.user.get_full_name }}" 
+                                 class="profile-img">
+                        {% else %}
+                            <div class="profile-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="educator-info">
+                            <h3 class="educator-name">
+                                <a href="{% url 'view_profile' educator.user_profile.user.id %}" 
+                                   class="text-primary">
+                                    {{ educator.user_profile.user.get_full_name|default:educator.user_profile.user.username }}
+                                </a>
+                            </h3>
+                            <p class="skill-taught">{{ educator.skill.name }}</p>
+                            {% if educator.user_profile.location %}
+                                <p class="location text-muted">
+                                    <i class="fas fa-map-marker-alt"></i> {{ educator.user_profile.location }}
+                                </p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="educator-badges">
+                            <span class="proficiency-badge">{{ educator.proficiency_level|title }}</span>
+                            {% if educator.user_profile.rating > 0 %}
+                                <div class="rating mt-1">
+                                    <span class="stars">
+                                        {% for i in "12345"|make_list %}
+                                            {% if forloop.counter <= educator.user_profile.rating %}
+                                                ★
+                                            {% else %}
+                                                ☆
+                                            {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                    <span class="rating-text">({{ educator.user_profile.rating }})</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Educator Details -->
+                    <div class="educator-details mb-3">
+                        {% if educator.description %}
+                            <p class="description">{{ educator.description|truncatewords:20 }}</p>
+                        {% endif %}
+                        
+                        <div class="educator-stats d-flex gap-4 mb-3">
+                            <div class="stat">
+                                <strong>{{ educator.experience_years }}</strong>
+                                <span class="text-muted">years exp.</span>
+                            </div>
+                            <div class="stat">
+                                <strong>{{ educator.user_profile.total_students }}</strong>
+                                <span class="text-muted">students</span>
+                            </div>
+                            <div class="stat">
+                                <strong>{{ educator.user_profile.total_lessons }}</strong>
+                                <span class="text-muted">lessons</span>
+                            </div>
+                        </div>
+
+                        {% if educator.user_profile.general_teaching_hours %}
+                            <p class="availability">
+                                <i class="fas fa-clock"></i> 
+                                <strong>Available:</strong> {{ educator.user_profile.general_teaching_hours }}
+                            </p>
+                        {% endif %}
+                        
+                        {% if educator.user_profile.hourly_rate %}
+                            <p class="hourly-rate">
+                                <i class="fas fa-rupee-sign"></i> 
+                                <strong>₹{{ educator.user_profile.hourly_rate }}/hour</strong>
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="educator-actions">
+                        <div class="action-buttons d-flex gap-2 mb-3">
+                            <button class="btn btn-primary" onclick="offerPayment({{ educator.id }}, {{ educator.user_profile.hourly_rate|default:0 }})">
+                                <i class="fas fa-money-bill"></i> Offer Payment
+                            </button>
+                            <button class="btn btn-secondary" onclick="offerSkill({{ educator.id }})">
+                                <i class="fas fa-exchange-alt"></i> Offer Skill
+                            </button>
+                        </div>
+
+                        <!-- Payment Offer Form (Hidden by default) -->
+                        <div id="payment-form-{{ educator.id }}" class="offer-form d-none">
+                            <form method="post" action="{% url 'make_skill_request' educator.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="request_type" value="payment">
+                                <div class="form-group">
+                                    <label class="form-label">Payment Amount (₹)</label>
+                                    <input type="number" class="form-control" name="offered_amount" 
+                                           value="{{ educator.user_profile.hourly_rate|default:'' }}" 
+                                           step="0.01" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Message (Optional)</label>
+                                    <textarea class="form-control" name="message" rows="2" 
+                                              placeholder="Add a personal message..."></textarea>
+                                </div>
+                                <div class="form-actions d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary btn-small">
+                                        <i class="fas fa-paper-plane"></i> Send Offer
+                                    </button>
+                                    <button type="button" class="btn btn-secondary btn-small" 
+                                            onclick="cancelOffer({{ educator.id }})">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Skill Exchange Form (Hidden by default) -->
+                        <div id="skill-form-{{ educator.id }}" class="offer-form d-none">
+                            <form method="post" action="{% url 'make_skill_request' educator.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="request_type" value="skill">
+                                <div class="form-group">
+                                    <label class="form-label">Skill You're Offering</label>
+                                    <input type="text" class="form-control" name="offered_skill" 
+                                           placeholder="e.g., Web Design, Spanish Language..." required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Message (Optional)</label>
+                                    <textarea class="form-control" name="message" rows="2" 
+                                              placeholder="Describe your skill and experience..."></textarea>
+                                </div>
+                                <div class="form-actions d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary btn-small">
+                                        <i class="fas fa-paper-plane"></i> Send Offer
+                                    </button>
+                                    <button type="button" class="btn btn-secondary btn-small" 
+                                            onclick="cancelOffer({{ educator.id }})">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination (if needed) -->
+        <div class="pagination-wrapper text-center mt-5">
+            <p class="text-muted">Showing {{ educators.count }} results</p>
+        </div>
+    {% else %}
+        <div class="no-results text-center p-5">
+            <i class="fas fa-search text-muted" style="font-size: 4rem;"></i>
+            <h3 class="mt-3">No educators found</h3>
+            <p class="text-muted">
+                {% if query %}
+                    Try different keywords or browse all skills
+                {% else %}
+                    No educators have registered yet. Be the first to share your skills!
+                {% endif %}
+            </p>
+            <div class="mt-3">
+                {% if query %}
+                    <a href="{% url 'search_results' %}" class="btn btn-primary">Browse All Skills</a>
+                {% endif %}
+                <a href="{% url 'profile' %}" class="btn btn-secondary">Share Your Skills</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.search-header {
+    margin-bottom: 2rem;
+}
+
+.search-filters .filter-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-filters .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.educators-grid {
+    margin-top: 2rem;
+}
+
+.educator-card {
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.educator-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.educator-header {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.profile-placeholder {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: var(--light-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dark-gray);
+    font-size: 2.5rem;
+}
+
+.educator-name {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.educator-name a {
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.educator-name a:hover {
+    color: #8e2ec4 !important;
+}
+
+.skill-taught {
+    margin: 0;
+    font-weight: 600;
+    color: var(--dark-gray);
+    font-size: 1.1rem;
+}
+
+.location {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.educator-badges {
+    text-align: right;
+}
+
+.proficiency-badge {
+    background-color: var(--primary-purple);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.description {
+    color: var(--dark-gray);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.educator-stats {
+    padding: 1rem 0;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat strong {
+    display: block;
+    font-size: 1.2rem;
+    color: var(--primary-purple);
+}
+
+.stat .text-muted {
+    font-size: 0.8rem;
+}
+
+.availability, .hourly-rate {
+    margin: 0.5rem 0;
+    color: var(--dark-gray);
+}
+
+.hourly-rate {
+    font-size: 1.1rem;
+}
+
+.hourly-rate strong {
+    color: var(--primary-purple);
+}
+
+.action-buttons {
+    margin-top: 1rem;
+}
+
+.action-buttons .btn {
+    flex: 1;
+}
+
+.offer-form {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--light-gray);
+    margin-top: 1rem;
+}
+
+.offer-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.offer-form .form-actions {
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .search-filters .filter-row {
+        flex-direction: column;
+    }
+    
+    .educator-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .educator-badges {
+        text-align: center;
+    }
+    
+    .educator-stats {
+        justify-content: space-around;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .educators-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function offerPayment(educatorId, defaultAmount) {
+    // Hide all other forms
+    hideAllOfferForms();
+    
+    // Show payment form for this educator
+    const form = document.getElementById(`payment-form-${educatorId}`);
+    form.classList.remove('d-none');
+    
+    // Set default amount if provided
+    if (defaultAmount > 0) {
+        const amountInput = form.querySelector('input[name="offered_amount"]');
+        amountInput.value = defaultAmount;
+    }
+}
+
+function offerSkill(educatorId) {
+    // Hide all other forms
+    hideAllOfferForms();
+    
+    // Show skill form for this educator
+    const form = document.getElementById(`skill-form-${educatorId}`);
+    form.classList.remove('d-none');
+}
+
+function cancelOffer(educatorId) {
+    document.getElementById(`payment-form-${educatorId}`).classList.add('d-none');
+    document.getElementById(`skill-form-${educatorId}`).classList.add('d-none');
+}
+
+function hideAllOfferForms() {
+    const allForms = document.querySelectorAll('.offer-form');
+    allForms.forEach(form => {
+        form.classList.add('d-none');
+    });
+}
+
+// Close forms when clicking outside
+document.addEventListener('click', function(event) {
+    const isFormClick = event.target.closest('.offer-form');
+    const isButtonClick = event.target.closest('.action-buttons');
+    
+    if (!isFormClick && !isButtonClick) {
+        hideAllOfferForms();
+    }
+});
+</script>
+{% endblock %}

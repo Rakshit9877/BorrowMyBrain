@@ -1,0 +1,924 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Discover Skills - BorrowMyBrain{% endblock %}
+{% block body_class %}search-page{% endblock %}
+
+{% block content %}
+<!-- Search Header -->
+<section class="search-header section-light">
+    <div class="container">
+        <div class="search-header-content">
+            <h1 class="search-title animate-fade-in-up">
+                Discover Amazing Skills
+                <span class="gradient-text">Worldwide</span>
+            </h1>
+            <p class="search-subtitle animate-fade-in-up">
+                Find the perfect educator or skill to accelerate your learning journey
+            </p>
+            
+            <!-- Advanced Search Form -->
+            <form class="search-form animate-scale-in" method="GET" action="{% url 'search_results' %}">
+                <div class="search-input-group">
+                    <div class="search-field">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" 
+                               name="q" 
+                               class="search-input" 
+                               placeholder="What would you like to learn?"
+                               value="{{ request.GET.q }}">
+                    </div>
+                    
+                    <div class="search-field">
+                        <i class="fas fa-map-marker-alt search-icon"></i>
+                        <input type="text" 
+                               name="location" 
+                               class="search-input" 
+                               placeholder="Location (optional)"
+                               value="{{ request.GET.location }}">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary search-btn">
+                        <i class="fas fa-search"></i>
+                        Search
+                    </button>
+                </div>
+                
+                <!-- Advanced Filters -->
+                <div class="search-filters">
+                    <div class="filter-group">
+                        <select name="proficiency" class="filter-select">
+                            <option value="">All Levels</option>
+                            <option value="beginner" {% if request.GET.proficiency == 'beginner' %}selected{% endif %}>Beginner</option>
+                            <option value="intermediate" {% if request.GET.proficiency == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                            <option value="advanced" {% if request.GET.proficiency == 'advanced' %}selected{% endif %}>Advanced</option>
+                            <option value="expert" {% if request.GET.proficiency == 'expert' %}selected{% endif %}>Expert</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <select name="sort" class="filter-select">
+                            <option value="">Sort by</option>
+                            <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>Highest Rated</option>
+                            <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                            <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                            <option value="experience" {% if request.GET.sort == 'experience' %}selected{% endif %}>Most Experienced</option>
+                        </select>
+                    </div>
+                    
+                    <button type="button" class="filter-toggle btn btn-outline-small" id="advancedFilters">
+                        <i class="fas fa-sliders-h"></i> More Filters
+                    </button>
+                </div>
+                
+                <!-- Collapsible Advanced Filters -->
+                <div class="advanced-filters-panel" id="advancedFiltersPanel">
+                    <div class="filter-grid">
+                        <div class="filter-item">
+                            <label class="filter-label">Price Range</label>
+                            <div class="price-range">
+                                <input type="number" name="min_price" placeholder="Min ₹" class="price-input" value="{{ request.GET.min_price }}">
+                                <span class="price-separator">to</span>
+                                <input type="number" name="max_price" placeholder="Max ₹" class="price-input" value="{{ request.GET.max_price }}">
+                            </div>
+                        </div>
+                        
+                        <div class="filter-item">
+                            <label class="filter-label">Availability</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="availability" value="weekdays" {% if 'weekdays' in request.GET.availability %}checked{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Weekdays
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="availability" value="weekends" {% if 'weekends' in request.GET.availability %}checked{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Weekends
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-item">
+                            <label class="filter-label">Teaching Method</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="method" value="online" {% if 'online' in request.GET.method %}checked{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Online
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="method" value="in_person" {% if 'in_person' in request.GET.method %}checked{% endif %}>
+                                    <span class="checkmark"></span>
+                                    In Person
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Categories -->
+<section class="quick-categories">
+    <div class="container">
+        <div class="categories-scroll">
+            <a href="?category=programming" class="category-chip {% if request.GET.category == 'programming' %}active{% endif %}">
+                <i class="fas fa-code"></i> Programming
+            </a>
+            <a href="?category=languages" class="category-chip {% if request.GET.category == 'languages' %}active{% endif %}">
+                <i class="fas fa-language"></i> Languages
+            </a>
+            <a href="?category=music" class="category-chip {% if request.GET.category == 'music' %}active{% endif %}">
+                <i class="fas fa-music"></i> Music
+            </a>
+            <a href="?category=design" class="category-chip {% if request.GET.category == 'design' %}active{% endif %}">
+                <i class="fas fa-palette"></i> Design
+            </a>
+            <a href="?category=business" class="category-chip {% if request.GET.category == 'business' %}active{% endif %}">
+                <i class="fas fa-briefcase"></i> Business
+            </a>
+            <a href="?category=fitness" class="category-chip {% if request.GET.category == 'fitness' %}active{% endif %}">
+                <i class="fas fa-dumbbell"></i> Fitness
+            </a>
+            <a href="?category=cooking" class="category-chip {% if request.GET.category == 'cooking' %}active{% endif %}">
+                <i class="fas fa-utensils"></i> Cooking
+            </a>
+            <a href="?category=photography" class="category-chip {% if request.GET.category == 'photography' %}active{% endif %}">
+                <i class="fas fa-camera"></i> Photography
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Search Results -->
+<section class="search-results section">
+    <div class="container">
+        <div class="results-header">
+            <div class="results-info">
+                {% if request.GET.q %}
+                    <h2 class="results-title">
+                        Search results for "<span class="search-term">{{ request.GET.q }}</span>"
+                    </h2>
+                    <p class="results-count">{{ educators.count }} educator{{ educators.count|pluralize }} found</p>
+                {% else %}
+                    <h2 class="results-title">All Available Skills</h2>
+                    <p class="results-count">{{ educators.count }} educator{{ educators.count|pluralize }} available</p>
+                {% endif %}
+            </div>
+            
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="grid">
+                    <i class="fas fa-th-large"></i>
+                </button>
+                <button class="view-btn" data-view="list">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+        
+        {% if educators %}
+            <div class="skills-grid" id="skillsContainer">
+                {% for educator in educators %}
+                <div class="skill-card card card-elevated animate-fade-in-up" data-skill-id="{{ educator.id }}">
+                    <div class="skill-card-header">
+                        <div class="educator-info">
+                            {% if educator.profile_picture %}
+                                <img src="{{ educator.profile_picture.url }}" 
+                                     alt="{{ educator.user.get_full_name }}" 
+                                     class="profile-img profile-img-medium">
+                            {% else %}
+                                <div class="profile-placeholder profile-img-medium">
+                                    {{ educator.user.first_name.0|default:educator.user.username.0|upper }}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="educator-details">
+                                <h3 class="educator-name">
+                                    {{ educator.user.get_full_name|default:educator.user.username }}
+                                </h3>
+                                <div class="educator-meta">
+                                    <div class="rating">
+                                        <div class="stars">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= educator.rating %}
+                                                    <i class="fas fa-star"></i>
+                                                {% else %}
+                                                    <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <span class="rating-text">({{ educator.rating }})</span>
+                                    </div>
+                                    {% if educator.location %}
+                                        <span class="location">
+                                            <i class="fas fa-map-marker-alt"></i> {{ educator.location }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="skill-actions">
+                            <button class="btn-icon heart-btn" data-skill-id="{{ educator.id }}">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            {% if educator.hourly_rate %}
+                                <div class="price-badge">
+                                    <span class="currency">₹</span>{{ educator.hourly_rate }}<span class="period">/hr</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="skill-card-body">
+                        <h4 class="skill-title">
+                            {% if educator.teachableskill_set.all %}
+                                {% for skill in educator.teachableskill_set.all|slice:":1" %}{{ skill.skill.name }}{% endfor %}
+                                {% if educator.teachableskill_set.count > 1 %}
+                                    <span class="more-skills">+{{ educator.teachableskill_set.count|add:"-1" }} more</span>
+                                {% endif %}
+                            {% else %}
+                                Professional Educator
+                            {% endif %}
+                        </h4>
+                        
+                        <div class="skill-tags">
+                            {% for skill in educator.teachableskill_set.all|slice:":3" %}
+                                <span class="skill-tag proficiency-{{ skill.proficiency_level }}">
+                                    {{ skill.proficiency_level|title }}
+                                </span>
+                            {% endfor %}
+                            {% if educator.is_verified %}
+                                <span class="skill-tag verified">
+                                    <i class="fas fa-check-circle"></i> Verified
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        {% if educator.bio %}
+                            <p class="skill-description">
+                                {{ educator.bio|truncatewords:20 }}
+                            </p>
+                        {% endif %}
+                        
+                        <div class="skill-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-users"></i>
+                                <span>{{ educator.students_taught|default:0 }} students</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-clock"></i>
+                                <span>{{ educator.response_time|default:"Quick" }} response</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-card-footer">
+                        <a href="{% url 'view_profile' educator.user.id %}" 
+                           class="btn btn-primary skill-cta">
+                            <i class="fas fa-arrow-right"></i> View Profile
+                        </a>
+                        <button class="btn btn-outline contact-btn" data-educator="{{ educator.user.username }}">
+                            <i class="fas fa-comments"></i> Contact
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Load More Button -->
+            <div class="load-more-section text-center">
+                <button class="btn btn-outline btn-large load-more-btn">
+                    <i class="fas fa-plus"></i> Load More Skills
+                </button>
+            </div>
+        {% else %}
+            <div class="empty-results">
+                <div class="empty-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>No educators found</h3>
+                {% if request.GET.q %}
+                    <p>We couldn't find any educators matching "<strong>{{ request.GET.q }}</strong>". Try adjusting your search or browse all skills.</p>
+                    <div class="empty-actions">
+                        <a href="{% url 'search_results' %}" class="btn btn-primary">
+                            <i class="fas fa-list"></i> Browse All Skills
+                        </a>
+                        <a href="{% url 'profile' %}" class="btn btn-outline">
+                            <i class="fas fa-plus"></i> Share Your Skill
+                        </a>
+                    </div>
+                {% else %}
+                    <p>No skills have been shared yet. Be the first to share your expertise!</p>
+                    <a href="{% url 'profile' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Share Your First Skill
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+/* Search Header */
+.search-header {
+    background: var(--gradient-primary);
+    color: white;
+    padding: 4rem 0 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.search-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="25" cy="25" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+    animation: float 20s infinite linear;
+}
+
+.search-header-content {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.search-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+}
+
+.search-subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 3rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.search-form {
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    box-shadow: var(--shadow-xl);
+}
+
+.search-input-group {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.search-field {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dark-gray);
+    z-index: 2;
+}
+
+.search-input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    transition: all var(--transition-normal);
+    background: white;
+}
+
+.search-input:focus {
+    border-color: var(--primary-purple);
+    box-shadow: 0 0 0 3px rgba(164, 53, 240, 0.1);
+    outline: none;
+}
+
+.search-btn {
+    padding: 1rem 2rem;
+    white-space: nowrap;
+}
+
+.search-filters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-select {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-md);
+    background: white;
+    color: var(--primary-black);
+    min-width: 140px;
+}
+
+.filter-toggle {
+    margin-left: auto;
+}
+
+.advanced-filters-panel {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--light-gray);
+    display: none;
+}
+
+.advanced-filters-panel.active {
+    display: block;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.filter-label {
+    display: block;
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: 0.5rem;
+}
+
+.price-range {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.price-input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-sm);
+}
+
+.price-separator {
+    color: var(--dark-gray);
+    font-weight: 500;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Quick Categories */
+.quick-categories {
+    background: white;
+    border-bottom: 1px solid var(--light-gray);
+    padding: 1rem 0;
+    position: sticky;
+    top: 80px;
+    z-index: 10;
+}
+
+.categories-scroll {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.categories-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.category-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--light-gray);
+    color: var(--dark-gray);
+    text-decoration: none;
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+    transition: all var(--transition-normal);
+    font-weight: 500;
+}
+
+.category-chip:hover,
+.category-chip.active {
+    background: var(--primary-purple);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Results Section */
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.results-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.search-term {
+    color: var(--primary-purple);
+}
+
+.results-count {
+    color: var(--dark-gray);
+    margin: 0;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.view-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--light-gray);
+    background: white;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dark-gray);
+    transition: all var(--transition-normal);
+    cursor: pointer;
+}
+
+.view-btn.active,
+.view-btn:hover {
+    background: var(--primary-purple);
+    color: white;
+    border-color: var(--primary-purple);
+}
+
+/* Skills Grid */
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.skill-card {
+    transition: all var(--transition-normal);
+    border: 1px solid var(--light-gray);
+    overflow: hidden;
+}
+
+.skill-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.skill-card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--light-gray);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.educator-info {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+}
+
+.educator-details {
+    flex: 1;
+}
+
+.educator-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-black);
+    margin-bottom: 0.5rem;
+}
+
+.educator-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stars {
+    color: var(--accent-orange);
+}
+
+.rating-text {
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+}
+
+.location {
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+}
+
+.skill-actions {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.heart-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: none;
+    color: var(--dark-gray);
+    border-radius: 50%;
+    transition: all var(--transition-normal);
+    cursor: pointer;
+}
+
+.heart-btn:hover {
+    background: rgba(255, 182, 193, 0.1);
+    color: #ff6b9d;
+}
+
+.heart-btn.active {
+    color: #ff6b9d;
+}
+
+.price-badge {
+    background: var(--gradient-primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.skill-card-body {
+    padding: 1.5rem;
+}
+
+.skill-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary-purple);
+    margin-bottom: 1rem;
+}
+
+.more-skills {
+    font-size: 0.8rem;
+    color: var(--dark-gray);
+    font-weight: 400;
+}
+
+.skill-tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.skill-tag {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.skill-tag.proficiency-beginner {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.skill-tag.proficiency-intermediate {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.skill-tag.proficiency-advanced {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.skill-tag.proficiency-expert {
+    background: #e8f5e8;
+    color: #2e7d32;
+}
+
+.skill-tag.verified {
+    background: #e8f5e8;
+    color: #2e7d32;
+}
+
+.skill-description {
+    color: var(--dark-gray);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.skill-stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+}
+
+.skill-card-footer {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    display: flex;
+    gap: 1rem;
+}
+
+.skill-cta {
+    flex: 1;
+}
+
+.contact-btn {
+    flex-shrink: 0;
+}
+
+/* Empty Results */
+.empty-results {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: var(--dark-gray);
+    margin-bottom: 2rem;
+}
+
+.empty-results h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.empty-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.load-more-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--light-gray);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .search-input-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .search-filters {
+        justify-content: center;
+    }
+    
+    .results-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .skills-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .skill-card-footer {
+        flex-direction: column;
+    }
+    
+    .empty-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Advanced filters toggle
+    const advancedFiltersBtn = document.getElementById('advancedFilters');
+    const advancedFiltersPanel = document.getElementById('advancedFiltersPanel');
+    
+    if (advancedFiltersBtn && advancedFiltersPanel) {
+        advancedFiltersBtn.addEventListener('click', function() {
+            advancedFiltersPanel.classList.toggle('active');
+            const icon = this.querySelector('i');
+            if (advancedFiltersPanel.classList.contains('active')) {
+                icon.className = 'fas fa-chevron-up';
+            } else {
+                icon.className = 'fas fa-sliders-h';
+            }
+        });
+    }
+    
+    // View toggle functionality
+    const viewBtns = document.querySelectorAll('.view-btn');
+    const skillsContainer = document.getElementById('skillsContainer');
+    
+    viewBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const view = this.dataset.view;
+            
+            // Update active button
+            viewBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update container class
+            if (view === 'list') {
+                skillsContainer.classList.add('list-view');
+            } else {
+                skillsContainer.classList.remove('list-view');
+            }
+        });
+    });
+    
+    // Heart button functionality
+    const heartBtns = document.querySelectorAll('.heart-btn');
+    heartBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            this.classList.toggle('active');
+            
+            if (this.classList.contains('active')) {
+                icon.className = 'fas fa-heart';
+            } else {
+                icon.className = 'far fa-heart';
+            }
+        });
+    });
+    
+    // Contact button functionality
+    const contactBtns = document.querySelectorAll('.contact-btn');
+    contactBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const educator = this.dataset.educator;
+            // Implement contact functionality here
+            alert(`Contact functionality for ${educator} - to be implemented`);
+        });
+    });
+    
+    // Load more functionality
+    const loadMoreBtn = document.querySelector('.load-more-btn');
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', function() {
+            // Implement load more functionality here
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            
+            // Simulate loading
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-plus"></i> Load More Skills';
+            }, 2000);
+        });
+    }
+    
+    // Auto-submit form on filter change
+    const filterSelects = document.querySelectorAll('.filter-select');
+    filterSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            this.closest('form').submit();
+        });
+    });
+});
+</script>
+{% endblock %}

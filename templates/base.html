@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BorrowMyBrain - Share Your Skills{% endblock %}</title>
+    {% load static %}
+    
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Meta Tags for SEO -->
+    <meta name="description" content="{% block description %}Share your skills and learn from others. BorrowMyBrain connects passionate educators and learners worldwide.{% endblock %}">
+    <meta name="keywords" content="skill sharing, online learning, education, tutoring, peer-to-peer learning">
+    <meta name="author" content="BorrowMyBrain">
+    
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="{% block og_title %}BorrowMyBrain - Share Your Skills{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Connect with passionate educators and learners. Offer your expertise or discover new skills through payment or skill exchange.{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    <!-- Header -->
+    <header class="header" id="main-header">
+        <div class="nav-container">
+            <a href="{% url 'home' %}" class="logo animate-scale-in">
+                <i class="fas fa-brain"></i> BorrowMyBrain
+            </a>
+            
+            <div class="search-bar">
+                <form method="GET" action="{% url 'search_results' %}" class="search-form">
+                    <input type="text" name="q" placeholder="What do you want to learn today?" 
+                           value="{{ request.GET.q }}" autocomplete="off">
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu animate-fade-in-right">
+                    <li><a href="{% url 'home' %}">
+                        <i class="fas fa-home"></i> Home
+                    </a></li>
+                    <li><a href="{% url 'search_results' %}">
+                        <i class="fas fa-search"></i> Browse Skills
+                    </a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'profile' %}">
+                            <i class="fas fa-user"></i> My Profile
+                        </a></li>
+                        <li><a href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a></li>
+                    {% else %}
+                        <li><a href="{% url 'login_signup' %}" class="btn btn-primary btn-small">
+                            <i class="fas fa-user-plus"></i> Sign Up
+                        </a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="reading-progress"></div>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} animate-fade-in-up" role="alert">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'warning' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                    {{ message }}
+                    <button class="alert-close" onclick="this.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>BorrowMyBrain</h3>
+                    <p>Connecting passionate educators and learners worldwide. Share knowledge, grow together.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'search_results' %}">Browse Skills</a></li>
+                        <li><a href="{% url 'login_signup' %}">Sign Up</a></li>
+                        <li><a href="#">How It Works</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Safety</a></li>
+                        <li><a href="#">Community Guidelines</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Accessibility</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 BorrowMyBrain. All rights reserved.</p>
+                <p>Made with <i class="fas fa-heart text-danger"></i> for learners everywhere</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
