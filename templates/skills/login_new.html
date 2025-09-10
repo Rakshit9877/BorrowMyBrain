@@ -1,59 +1,37 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Sign Up - BorrowMyBrain{% endblock %}
-
-{% block body_class %}no-header{% endblock %}
-
-{% block header %}{% endblock %}
+{% block title %}Login - BorrowMyBrain{% endblock %}
 
 {% block content %}
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-header">
-            <h2>Join BorrowMyBrain</h2>
-            <p>Start your journey of sharing and learning</p>
+            <h2>Welcome Back</h2>
+            <p>Continue your learning journey</p>
         </div>
         
         <form method="post" class="auth-form">
             {% csrf_token %}
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="first_name">First Name</label>
-                    <input type="text" id="first_name" name="first_name" required>
-                </div>
-                <div class="form-group">
-                    <label for="last_name">Last Name</label>
-                    <input type="text" id="last_name" name="last_name" required>
-                </div>
-            </div>
-            
             <div class="form-group">
-                <label for="username">Username</label>
+                <label for="username">Username or Email</label>
                 <input type="text" id="username" name="username" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required>
             </div>
             
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
-                <div class="password-requirements">
-                    <small>Password must be at least 8 characters long</small>
-                </div>
             </div>
             
-            <div class="form-group">
+            <div class="form-options">
                 <label class="checkbox-label">
-                    <input type="checkbox" name="terms_accepted" required>
-                    I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>
+                    <input type="checkbox" name="remember_me">
+                    Remember me
                 </label>
+                <a href="#" class="forgot-password">Forgot password?</a>
             </div>
             
-            <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+            <button type="submit" class="btn btn-primary btn-full">Log In</button>
         </form>
         
         <div class="auth-divider">
@@ -63,16 +41,16 @@
         <div class="social-login">
             <button class="btn-social btn-google" type="button">
                 <img src="https://www.svgrepo.com/show/303108/google-icon-logo.svg" alt="Google">
-                Sign up with Google
+                Continue with Google
             </button>
             <button class="btn-social btn-linkedin" type="button">
                 <img src="https://www.svgrepo.com/show/448234/linkedin.svg" alt="LinkedIn">
-                Sign up with LinkedIn
+                Continue with LinkedIn
             </button>
         </div>
         
         <p class="auth-switch">
-            Already have an account? <a href="{% url 'login' %}">Log in</a>
+            Don't have an account? <a href="{% url 'signup' %}">Sign up</a>
         </p>
     </div>
 </div>
@@ -92,7 +70,7 @@
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     padding: 2.5rem;
     width: 100%;
-    max-width: 550px;
+    max-width: 400px;
 }
 
 .auth-header {
@@ -108,15 +86,6 @@
 .auth-header p {
     color: var(--body-gray);
     font-size: 0.9rem;
-}
-
-.form-row {
-    display: flex;
-    gap: 1rem;
-}
-
-.form-row .form-group {
-    flex: 1;
 }
 
 .auth-form .form-group {
@@ -145,33 +114,29 @@
     border-color: var(--primary-purple);
 }
 
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
 .checkbox-label {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     font-size: 0.9rem;
     cursor: pointer;
-    line-height: 1.4;
 }
 
 .checkbox-label input {
     width: auto;
     margin-right: 0.5rem;
-    margin-top: 0.1rem;
-    flex-shrink: 0;
 }
 
-.checkbox-label a {
+.forgot-password {
     color: var(--primary-purple);
     text-decoration: none;
-}
-
-.password-requirements {
-    margin-top: 0.5rem;
-}
-
-.password-requirements small {
-    color: var(--body-gray);
-    font-size: 0.8rem;
+    font-size: 0.9rem;
 }
 
 .btn-full {

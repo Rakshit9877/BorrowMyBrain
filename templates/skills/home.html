@@ -1,17 +1,9 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borrow My Brain - Micro-Learning Marketplace</title>
-    <meta name="description" content="Trade or sell 15-60 minute micro-sessions of expertise. Flexible exchange models with AI-powered features and QR-verified meetups.">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
+
+{% block title %}BorrowMyBrain - Micro-Learning Marketplace{% endblock %}
+
+{% block content %}
     <!-- Top Promotional Banner -->
     <div class="promo-banner" id="promo-banner">
         <div class="container">
@@ -24,50 +16,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Navigation -->
-    <nav class="navbar" id="navbar">
-        <div class="container">
-            <div class="nav-brand">
-                <span class="brand-text">BorrowMy<span class="brain-highlight">Brain</span></span>
-            </div>
-            
-            <div class="nav-search">
-                <div class="search-container">
-                    <form action="{% url 'search_results' %}" method="get">
-                        <input type="text" name="q" placeholder="Search for skills, topics, or experts..." class="search-input">
-                        <button class="search-btn" aria-label="Search" type="submit">
-                            <svg width="30" height="20" viewBox="0 0 24 24" fill="none">
-                                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                    </form>
-                </div>
-            </div>
-            
-            <ul class="nav-menu" id="nav-menu">
-                <li><a href="{% url 'search_results' %}" class="nav-link">Browse Sessions</a></li>
-                <li><a href="#" class="nav-link">Teach on Platform</a></li>
-                <li><a href="#" class="nav-link">Business</a></li>
-                <li>
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'profile' %}" class="btn btn-outline">Profile</a>
-                            <a href="{% url 'create_profile' %}" class="btn btn-primary">Complete Profile</a>
-                            <a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
-                        {% else %}
-                            <a href="{% url 'login' %}" class="btn btn-outline" id="login-btn">Log in</a>
-                            <a href="{% url 'signup' %}" class="btn btn-primary" id="signup-btn">Sign up</a>
-                        {% endif %}
-                    </div>
-                </li>
-            </ul>
-            <div class="hamburger" id="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </nav>
 
     <!-- Hero Section -->
     <section class="hero" id="hero">
@@ -83,16 +31,16 @@
                                 Trade or sell micro-sessions of your expertise (15-60 minutes). Pay with money, barter skills, or create hybrid exchanges. Every session powered by advanced AI for intelligent learning.
                             </p>
                             <div class="hero-buttons">
-                                <button class="btn btn-primary btn-large">
+                                <a href="{% url 'signup' %}" class="btn btn-primary btn-large">
                                     Start Trading Skills
-                                </button>
-                                <button class="btn btn-outline btn-large">
+                                </a>
+                                <a href="{% url 'search_results' %}" class="btn btn-outline btn-large">
                                     Explore Sessions
-                                </button>
+                                </a>
                             </div>
                         </div>
                         <div class="hero-image">
-                            <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=600&h=400&fit=crop" alt="Person learning with AI and technology" />
+                            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=400&fit=crop&auto=format" alt="People collaborating and learning together" />
                         </div>
                     </div>
                 </div>
@@ -205,6 +153,124 @@
         </div>
     </section>
 
+    <!-- Personalized Content for Logged In Users -->
+    {% if is_personalized %}
+    <section class="personalized-content" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 60px 0;">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2 style="color: white; margin-bottom: 20px;">Welcome back, {{ user.get_full_name|default:user.username }}!</h2>
+                <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem;">Here's what's happening in your learning journey</p>
+            </div>
+
+            <!-- Learning Preferences Based on Budget -->
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100" style="background: rgba(255,255,255,0.1); border: none; backdrop-filter: blur(10px);">
+                        <div class="card-body text-center">
+                            <h5 style="color: #4CAF50; margin-bottom: 15px;">💰 Budget-Friendly Skills</h5>
+                            <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">Skills under $30/hour</p>
+                            {% if affordable_skills %}
+                                <div class="skill-list">
+                                    {% for skill in affordable_skills %}
+                                        <div class="skill-item" style="background: rgba(255,255,255,0.1); margin: 8px 0; padding: 12px; border-radius: 8px;">
+                                            <strong>{{ skill.skill.name }}</strong><br>
+                                            <small>${{ skill.user_profile.hourly_rate }}/hr • {{ skill.user_profile.user.get_full_name }}</small>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p style="color: rgba(255,255,255,0.7);">No budget-friendly skills available yet.</p>
+                            {% endif %}
+                            <a href="{% url 'search_results' %}?rate=low" class="btn btn-light btn-sm mt-3">View All</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100" style="background: rgba(255,255,255,0.1); border: none; backdrop-filter: blur(10px);">
+                        <div class="card-body text-center">
+                            <h5 style="color: #FF9800; margin-bottom: 15px;">⚡ Premium Skills</h5>
+                            <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">Skills $30-60/hour</p>
+                            {% if mid_range_skills %}
+                                <div class="skill-list">
+                                    {% for skill in mid_range_skills %}
+                                        <div class="skill-item" style="background: rgba(255,255,255,0.1); margin: 8px 0; padding: 12px; border-radius: 8px;">
+                                            <strong>{{ skill.skill.name }}</strong><br>
+                                            <small>${{ skill.user_profile.hourly_rate }}/hr • {{ skill.user_profile.user.get_full_name }}</small>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p style="color: rgba(255,255,255,0.7);">No mid-range skills available yet.</p>
+                            {% endif %}
+                            <a href="{% url 'search_results' %}?rate=mid" class="btn btn-light btn-sm mt-3">View All</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100" style="background: rgba(255,255,255,0.1); border: none; backdrop-filter: blur(10px);">
+                        <div class="card-body text-center">
+                            <h5 style="color: #9C27B0; margin-bottom: 15px;">💎 Expert Level</h5>
+                            <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">Skills $60+/hour</p>
+                            {% if premium_skills %}
+                                <div class="skill-list">
+                                    {% for skill in premium_skills %}
+                                        <div class="skill-item" style="background: rgba(255,255,255,0.1); margin: 8px 0; padding: 12px; border-radius: 8px;">
+                                            <strong>{{ skill.skill.name }}</strong><br>
+                                            <small>${{ skill.user_profile.hourly_rate }}/hr • {{ skill.user_profile.user.get_full_name }}</small>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p style="color: rgba(255,255,255,0.7);">No premium skills available yet.</p>
+                            {% endif %}
+                            <a href="{% url 'search_results' %}?rate=high" class="btn btn-light btn-sm mt-3">View All</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Educators -->
+            {% if recent_educators %}
+            <div class="recent-educators mt-5">
+                <h4 style="color: white; text-align: center; margin-bottom: 30px;">🌟 Recently Joined Educators</h4>
+                <div class="row">
+                    {% for educator in recent_educators %}
+                    <div class="col-md-2 col-sm-4 col-6 mb-3">
+                        <div class="educator-card text-center" style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px);">
+                            {% if educator.profile_picture %}
+                                <img src="{{ educator.profile_picture.url }}" alt="{{ educator.user.get_full_name }}" 
+                                     style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;">
+                            {% else %}
+                                <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                                    <i class="fas fa-user" style="font-size: 1.5rem; color: rgba(255,255,255,0.7);"></i>
+                                </div>
+                            {% endif %}
+                            <h6 style="color: white; font-size: 0.9rem; margin-bottom: 5px;">{{ educator.user.get_full_name|default:educator.user.username }}</h6>
+                            <small style="color: rgba(255,255,255,0.7);">{{ educator.teachable_skills.count }} skill{{ educator.teachable_skills.count|pluralize }}</small>
+                            <br>
+                            <a href="{% url 'view_profile' educator.user.id %}" class="btn btn-outline-light btn-sm mt-2" style="font-size: 0.8rem;">View</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Quick Actions -->
+            <div class="quick-actions text-center mt-5">
+                <h5 style="color: white; margin-bottom: 20px;">Quick Actions</h5>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{% url 'search_results' %}" class="btn btn-light">🔍 Find Skills</a>
+                    <a href="{% url 'create_profile' %}" class="btn btn-outline-light">✏️ Update Profile</a>
+                    <a href="{% url 'profile' %}" class="btn btn-outline-light">👤 My Profile</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
     <!-- How It Works Section -->
     <section class="how-it-works" id="how-it-works">
         <div class="container">
@@ -251,8 +317,13 @@
                 <h2>Ready to Share Your Brain?</h2>
                 <p>Join thousands of learners and teachers in the world's first intelligent skill-sharing marketplace</p>
                 <div class="cta-buttons">
-                    <button class="btn btn-primary btn-large" id="cta-signup">Get Started Free</button>
-                    <button class="btn btn-outline btn-large" id="cta-login">Already a Member? Log In</button>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'create_profile' %}" class="btn btn-primary btn-large">Complete Your Profile</a>
+                        <a href="{% url 'search_results' %}" class="btn btn-outline btn-large">Browse Skills</a>
+                    {% else %}
+                        <a href="{% url 'signup' %}" class="btn btn-primary btn-large">Get Started Free</a>
+                        <a href="{% url 'login' %}" class="btn btn-outline btn-large">Already a Member? Log In</a>
+                    {% endif %}
                 </div>
                 <div class="cta-features">
                     <div class="cta-feature">
@@ -679,12 +750,10 @@
                 </div>
                 
                 <p class="auth-switch">
-                    Already have an account? <a href="#" class="switch-to-login">Log in</a>
+                    Already have an account? <a href="{% url 'login' %}" class="switch-to-login">Log in</a>
                 </p>
             </div>
         </div>
     </div>
 
-    <script src="{% static 'js/main.js' %}"></script>
-</body>
-</html>
+{% endblock %}

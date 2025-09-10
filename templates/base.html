@@ -33,46 +33,48 @@
 </head>
 <body class="{% block body_class %}{% endblock %}">
     <!-- Header -->
-    <header class="header" id="main-header">
-        <div class="nav-container">
-            <a href="{% url 'home' %}" class="logo animate-scale-in">
-                <i class="fas fa-brain"></i> BorrowMyBrain
-            </a>
-            
-            <div class="search-bar">
-                <form method="GET" action="{% url 'search_results' %}" class="search-form">
-                    <input type="text" name="q" placeholder="What do you want to learn today?" 
-                           value="{{ request.GET.q }}" autocomplete="off">
-                    <button type="submit" class="search-btn">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
+    {% block header %}
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="{% url 'home' %}" class="brand-text">BorrowMy<span class="brain-highlight">Brain</span></a>
             </div>
             
-            <nav>
-                <ul class="nav-menu animate-fade-in-right">
-                    <li><a href="{% url 'home' %}">
-                        <i class="fas fa-home"></i> Home
-                    </a></li>
-                    <li><a href="{% url 'search_results' %}">
-                        <i class="fas fa-search"></i> Browse Skills
-                    </a></li>
-                    {% if user.is_authenticated %}
-                        <li><a href="{% url 'profile' %}">
-                            <i class="fas fa-user"></i> My Profile
-                        </a></li>
-                        <li><a href="{% url 'logout' %}">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </a></li>
-                    {% else %}
-                        <li><a href="{% url 'login_signup' %}" class="btn btn-primary btn-small">
-                            <i class="fas fa-user-plus"></i> Sign Up
-                        </a></li>
-                    {% endif %}
-                </ul>
-            </nav>
+            <div class="nav-search">
+                <div class="search-container">
+                    <form action="{% url 'search_results' %}" method="get">
+                        <input type="text" name="q" placeholder="Search for skills, topics, or experts..." class="search-input" value="{{ request.GET.q }}">
+                        <button class="search-btn" aria-label="Search" type="submit">
+                            <svg width="30" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="{% url 'search_results' %}" class="nav-link">Browse Sessions</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'create_profile' %}" class="nav-link">Teach on Platform</a></li>
+                    <li><a href="{% url 'profile' %}" class="nav-link">My Profile</a></li>
+                    <li><a href="{% url 'logout' %}" class="btn btn-outline">Logout</a></li>
+                {% else %}
+                    <li><a href="#" class="nav-link">Teach on Platform</a></li>
+                    <li>
+                        <a href="{% url 'login' %}" class="btn btn-outline">Log in</a>
+                        <a href="{% url 'signup' %}" class="btn btn-primary">Sign up</a>
+                    </li>
+                {% endif %}
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
-    </header>
+    </nav>
+    {% endblock %}
 
     <!-- Progress Bar -->
     <div class="progress-bar" id="reading-progress"></div>

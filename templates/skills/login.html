@@ -1,305 +1,219 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - Preply Clone</title>
+{% extends 'base.html' %}
+{% load static %}
 
-    <!-- Import Inter (Apple-like modern font) -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+{% block title %}Login - BorrowMyBrain{% endblock %}
 
-    <style>
-      /* Color Scheme */
-      :root {
-        --purple: #a435f0;
-        --black: #1c1d1f;
-        --dark-gray: #6a6f73;
-        --light-gray: #d1d7dc;
-        --white: #ffffff;
-      }
+{% block body_class %}no-header{% endblock %}
 
-      body {
-        margin: 0;
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
-          Roboto, Helvetica, Arial, sans-serif;
-        background-color: var(--white);
-        color: var(--black);
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
+{% block header %}{% endblock %}
 
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px 32px;
-        border-bottom: 1px solid var(--light-gray);
-      }
-
-      header nav a {
-        margin: 0 15px;
-        text-decoration: none;
-        color: var(--black);
-        font-weight: 500;
-        font-size: 0.95rem;
-        transition: color 0.2s ease;
-      }
-
-      header nav a:hover {
-        color: var(--purple);
-      }
-
-      header .login-btn {
-        border: 1.5px solid var(--black);
-        padding: 6px 16px;
-        border-radius: 8px;
-        background: transparent;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 0.95rem;
-        transition: all 0.2s ease;
-      }
-
-      header .login-btn:hover {
-        border-color: var(--purple);
-        color: var(--purple);
-      }
-
-      .container {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        margin-top: 40px;
-      }
-
-      .login-box {
-        width: 400px;
-        text-align: center;
-      }
-
-      .login-box h2 {
-        font-size: 1.75rem;
-        margin-bottom: 20px;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-        color: #111827;
-      }
-
-      .social-btn {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        width: 120px;
-        height: 44px;
-        border: 1.5px solid var(--black);
-        border-radius: 25px;
-        margin: 8px;
-        font-weight: 500;
-        font-size: 1rem;
-        background: var(--white);
-        cursor: pointer;
-        transition: all 0.25s ease-in-out;
-      }
-
-      .social-btn:hover {
-        border-color: var(--purple);
-        color: var(--purple);
-      }
-
-      .divider {
-        display: flex;
-        align-items: center;
-        text-align: center;
-        margin: 20px 0;
-        color: var(--dark-gray);
-        font-size: 0.9rem;
-      }
-
-      .divider::before,
-      .divider::after {
-        content: "";
-        flex: 1;
-        border-bottom: 1px solid var(--light-gray);
-      }
-
-      .divider:not(:empty)::before {
-        margin-right: 0.75em;
-      }
-
-      .divider:not(:empty)::after {
-        margin-left: 0.75em;
-      }
-
-      form {
-        display: flex;
-        flex-direction: column;
-        text-align: left;
-      }
-
-      label {
-        font-size: 0.9rem;
-        margin-bottom: 6px;
-        font-weight: 500;
-        color: #374151;
-      }
-
-      input {
-        padding: 14px;
-        margin-bottom: 16px;
-        border: 1.5px solid var(--light-gray);
-        border-radius: 10px;
-        font-size: 0.95rem;
-        font-family: inherit;
-        transition: all 0.2s ease;
-        background: #fdfdfd;
-      }
-
-      input:focus {
-        border-color: var(--purple);
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(164, 53, 240, 0.15);
-        background: #fff;
-      }
-
-      .forgot {
-        font-size: 0.85rem;
-        color: var(--purple);
-        text-decoration: none;
-        margin-bottom: 16px;
-        display: inline-block;
-        font-weight: 500;
-      }
-
-      .forgot:hover {
-        text-decoration: underline;
-      }
-
-      .remember {
-        display: flex;
-        align-items: center;
-        margin-bottom: 20px;
-        font-size: 0.9rem;
-        color: #374151;
-      }
-
-      .remember input {
-        margin-right: 8px;
-      }
-
-      .submit-btn {
-        background: var(--purple);
-        color: var(--white);
-        border: none;
-        padding: 16px;
-        border-radius: 10px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease-in-out;
-      }
-
-      .submit-btn:hover {
-        background: #8329c8;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 14px rgba(164, 53, 240, 0.25);
-      }
-
-      .footer-note {
-        font-size: 0.8rem;
-        margin-top: 12px;
-        color: var(--dark-gray);
-        text-align: center;
-        line-height: 1.5;
-      }
-
-      .footer-note a {
-        color: var(--purple);
-        text-decoration: none;
-        font-weight: 600;
-      }
-
-      .footer-note a:hover {
-        text-decoration: underline;
-      }
-    </style>
-  </head>
-  <body>
-    <header>
-      <div class="logo"><strong>Borrow my Brain</strong></div>
-      <nav>
-        <a href="#">Find tutors</a>
-        <a href="#">For business</a>
-        <a href="#">Become a tutor</a>
-        <a href="#">Proven Progress</a>
-      </nav>
-      <button class="login-btn">Log In</button>
-    </header>
-
-    <div class="container">
-      <div class="login-box">
-        <h2>Log in</h2>
-        <form>
-          <label for="username">Username</label>
-          <input type="text" id="username" placeholder="Your username" />
-
-          <label for="email">Email</label>
-          <input type="email" id="email" placeholder="Your email" />
-
-          <label for="password">Password</label>
-          <input type="password" id="password" placeholder="Your password" />
-
-          <a class="forgot" href="#">Forgot your password?</a>
-
-          <div class="remember">
-            <input type="checkbox" id="remember" />
-            <label for="remember">Remember me</label>
-          </div>
-
-          <button type="submit" class="submit-btn">Log in</button>
-        </form>
-
-        <div class="divider">or log in with</div>
-
-        <div>
-          <button class="social-btn">
-            <img
-              src="https://www.svgrepo.com/show/355037/google.svg"
-              alt="Google"
-              width="20"
-              height="20"
-            />
-          </button>
-          <button class="social-btn">
-            <img
-              src="https://www.svgrepo.com/show/452196/facebook-1.svg"
-              alt="Facebook"
-              width="20"
-              height="20"
-            />
-          </button>
-          <button class="social-btn">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path
-                d="M16.365 1.43c0 1.14-.42 2.18-1.2 2.97-.76.78-1.85 1.32-2.99 1.24-.1-1.12.43-2.27 1.18-3.04.83-.88 2.2-1.45 3.01-1.17zm5.59 16.35c-.49 1.09-.72 1.58-1.36 2.54-1.05 1.55-2.53 3.47-4.36 3.49-1.64.02-2.06-1.04-4.28-1.03-2.22.01-2.69 1.05-4.33 1.03-1.83-.02-3.24-1.76-4.29-3.31-2.93-4.37-3.24-9.5-1.43-12.2 1.28-1.97 3.3-3.11 5.2-3.11 1.93 0 3.15 1.06 4.75 1.06 1.56 0 2.5-1.07 4.76-1.07 1.73 0 3.56.95 4.83 2.6-4.24 2.32-3.56 8.36.51 10z"
-              />
-            </svg>
-          </button>
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Welcome Back</h2>
+            <p>Continue your learning journey</p>
         </div>
-
-        <p class="footer-note">
-          By clicking Log in or Continue with, you agree to Preply
-          <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a>
+        
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username or Email</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="remember_me">
+                    Remember me
+                </label>
+                <a href="#" class="forgot-password">Forgot password?</a>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-full">Log In</button>
+        </form>
+        
+        <div class="auth-divider">
+            <span>or</span>
+        </div>
+        
+        <div class="social-login">
+            <button class="btn-social btn-google" type="button">
+                <img src="https://www.svgrepo.com/show/303108/google-icon-logo.svg" alt="Google">
+                Continue with Google
+            </button>
+            <button class="btn-social btn-linkedin" type="button">
+                <img src="https://www.svgrepo.com/show/448234/linkedin.svg" alt="LinkedIn">
+                Continue with LinkedIn
+            </button>
+        </div>
+        
+        <p class="auth-switch">
+            Don't have an account? <a href="{% url 'signup' %}">Sign up</a>
         </p>
-      </div>
     </div>
-  </body>
-</html>
+</div>
+
+<style>
+.auth-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 500px;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-header h2 {
+    color: var(--primary-black);
+    margin-bottom: 0.5rem;
+}
+
+.auth-header p {
+    color: var(--body-gray);
+    font-size: 0.9rem;
+}
+
+.auth-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.auth-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--primary-black);
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border-gray);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: var(--primary-purple);
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.checkbox-label input {
+    width: auto;
+    margin-right: 0.5rem;
+}
+
+.forgot-password {
+    color: var(--primary-purple);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.btn-full {
+    width: 100%;
+}
+
+.auth-divider {
+    text-align: center;
+    margin: 1.5rem 0;
+    position: relative;
+}
+
+.auth-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border-gray);
+}
+
+.auth-divider span {
+    background: white;
+    padding: 0 1rem;
+    color: var(--body-gray);
+    font-size: 0.9rem;
+}
+
+.social-login {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.btn-social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    border: 2px solid var(--border-gray);
+    border-radius: 8px;
+    background: white;
+    color: var(--primary-black);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.btn-social:hover {
+    border-color: var(--primary-purple);
+    transform: translateY(-1px);
+}
+
+.btn-social img {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.75rem;
+}
+
+.auth-switch {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--body-gray);
+}
+
+.auth-switch a {
+    color: var(--primary-purple);
+    text-decoration: none;
+    font-weight: 500;
+}
+</style>
+{% endblock %}

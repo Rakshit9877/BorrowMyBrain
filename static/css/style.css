@@ -165,8 +165,11 @@ section {
     background: linear-gradient(135deg, var(--accent-orange) 0%, #F39C12 100%);
     color: var(--white);
     padding: 0.75rem 0;
-    position: relative;
-    z-index: 1001;
+    position: fixed;
+    top: 80px; /* Position below navbar */
+    left: 0;
+    right: 0;
+    z-index: 999;
 }
 
 .promo-content {
@@ -254,6 +257,12 @@ section {
 .brand-text {
     font-size: 1.5rem;
     font-weight: var(--font-weight-bold);
+    color: var(--primary-black);
+    text-decoration: none;
+}
+
+.brand-text:hover {
+    text-decoration: none;
     color: var(--primary-black);
 }
 
@@ -447,7 +456,7 @@ section {
 /* Hero Section */
 .hero {
     background: linear-gradient(135deg, #E3F4FD 0%, #F0F9FF 100%);
-    padding: 8rem 0 4rem;
+    padding: 10rem 0 4rem; /* Increased top padding to accommodate navbar + promo banner */
     overflow: hidden;
 }
 

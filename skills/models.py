@@ -12,6 +12,37 @@ class UserProfile(models.Model):
     location = models.CharField(max_length=100, blank=True)
     general_teaching_hours = models.CharField(max_length=100, blank=True, help_text="e.g., Weekdays 6-9 PM")
     hourly_rate = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    
+    # New fields for enhanced profile
+    available_days = models.JSONField(default=list, blank=True, help_text="List of available days")
+    preferred_time = models.CharField(max_length=20, blank=True, choices=[
+        ('early_morning', 'Early Morning (6:00 AM - 9:00 AM)'),
+        ('morning', 'Morning (9:00 AM - 12:00 PM)'),
+        ('afternoon', 'Afternoon (12:00 PM - 5:00 PM)'),
+        ('evening', 'Evening (5:00 PM - 8:00 PM)'),
+        ('night', 'Night (8:00 PM - 11:00 PM)'),
+        ('flexible', 'Flexible'),
+    ])
+    teaching_mode = models.CharField(max_length=20, blank=True, choices=[
+        ('online', 'Online Only'),
+        ('in_person', 'In-Person Only'),
+        ('both', 'Both Online & In-Person'),
+    ])
+    hourly_rate_range = models.CharField(max_length=20, blank=True, choices=[
+        ('10-20', '$10 - $20 per hour'),
+        ('20-35', '$20 - $35 per hour'),
+        ('35-50', '$35 - $50 per hour'),
+        ('50-75', '$50 - $75 per hour'),
+        ('75-100', '$75 - $100 per hour'),
+        ('100+', '$100+ per hour'),
+    ])
+    experience_level = models.CharField(max_length=20, blank=True, choices=[
+        ('beginner', 'New to teaching (0-1 years)'),
+        ('intermediate', 'Some experience (1-3 years)'),
+        ('experienced', 'Experienced (3-5 years)'),
+        ('expert', 'Highly experienced (5+ years)'),
+    ])
+    
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     total_students = models.IntegerField(default=0)
     total_lessons = models.IntegerField(default=0)
