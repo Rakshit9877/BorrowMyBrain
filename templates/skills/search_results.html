@@ -283,12 +283,12 @@
                         </a>
                         {% with first_skill=educator.teachable_skills.all|first %}
                             {% if first_skill %}
-                                <a href="{% url 'start_session_with_skill' first_skill.id %}" class="btn btn-outline contact-btn">
-                                    <i class="fas fa-video"></i> Start Session
+                                <a href="{% url 'make_skill_request' first_skill.id %}" class="btn btn-outline contact-btn">
+                                    <i class="fas fa-handshake"></i> Offer & Start
                                 </a>
                             {% else %}
-                                <a href="{% url 'start_session' %}" class="btn btn-outline contact-btn">
-                                    <i class="fas fa-video"></i> Start Session
+                                <a href="{% url 'join_session_page' %}" class="btn btn-outline contact-btn">
+                                    <i class="fas fa-handshake"></i> Offer & Start
                                 </a>
                             {% endif %}
                         {% endwith %}

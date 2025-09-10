@@ -7,10 +7,38 @@ class SessionManager {
         this.initializeElements();
         this.setupEventListeners();
         this.startTimer();
-        this.loadMockTranscript();
-        this.mockVideoConnection();
+    this.loadMockTranscript();
+    this.mockVideoConnection();
+    this.bindDailyTranscript();
         
         console.log('Session Manager initialized for AI testing');
+    }
+
+    bindDailyTranscript() {
+        // Listen for synthetic transcript lines emitted by Daily integration (app-message or future events)
+        window.addEventListener('daily-transcript-line', (ev) => {
+            const detail = ev.detail || {};
+            const text = (detail.text || '').trim();
+            const speaker = (detail.speaker || 'Participant').trim();
+            if (!text) return;
+
+            const transcript = {
+                text: text,
+                timestamp: Date.now(),
+                speaker: speaker
+            };
+            this.transcripts.push(transcript);
+
+            const entry = document.createElement('div');
+            entry.className = 'transcript-entry';
+            entry.innerHTML = `
+                <div class="transcript-speaker">${transcript.speaker}</div>
+                <div class="transcript-text">${transcript.text}</div>
+                <div class="transcript-time">${this.formatTime(new Date(transcript.timestamp))}</div>
+            `;
+            this.elements.transcriptContainer.appendChild(entry);
+            this.elements.transcriptContainer.scrollTop = this.elements.transcriptContainer.scrollHeight;
+        });
     }
 
     initializeElements() {

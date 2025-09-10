@@ -27,14 +27,7 @@
 
         <main class="session-main">
             <div class="video-area">
-        <!-- Video area (placeholder without Daily.co join for now) -->
-        <div id="call-frame" class="daily-call-frame" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem;">
-                    <div style="text-align: center;">
-                        <i class="fas fa-video" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
-            <div>Video Session</div>
-            <div style="font-size: 0.9rem; opacity: 0.8;">You can generate an AI summary from the transcript</div>
-                    </div>
-                </div>
+                <div id="call-frame" class="daily-call-frame" style="background: #111; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; min-height: 320px;"></div>
                 <div class="video-controls">
                     <div class="control-group">
                         <button class="control-button" id="micBtn"><i class="fas fa-microphone"></i></button>
@@ -133,22 +126,38 @@
             geminiApiKey: "{{ gemini_api_key|default:'' }}"
         };
         
-        // Mock transcript data for immediate testing
-        window.mockTranscript = `Teacher: Welcome to this learning session! Today we'll be covering Python programming fundamentals.
-Student: That sounds great! I'm excited to learn about variables and functions in Python.
-Teacher: Let's start with variables. In Python, you can create a variable by simply assigning a value to it. For example: name = 'John'
-Student: I see! So Python automatically determines the data type? That's different from Java.
-Teacher: Exactly! Python is dynamically typed. Now let's talk about functions. Functions in Python are defined using the 'def' keyword.
-Student: Can you show me an example of a simple function?
-Teacher: Sure! Here's a simple function: def greet(name): return f'Hello, {name}!' This function takes a name parameter and returns a greeting.
-Student: That's really helpful! How do I call this function?
-Teacher: You simply call it like this: greet('Alice') and it will return 'Hello, Alice!'
-Student: Perfect! This makes so much sense. Can functions return multiple values?
-Teacher: Yes! In Python, you can return multiple values as a tuple. For example: def get_name_age(): return 'John', 25
-Student: Wow, Python is so flexible! What about loops? How do they work?
-Teacher: Great question! Python has for loops and while loops. A simple for loop looks like: for i in range(5): print(i)
-Student: That's much cleaner than Java syntax. I love how readable Python is!
-Teacher: Exactly! Python emphasizes readability and simplicity. That's why it's great for beginners and professionals alike.`;
+                // Optional: initial transcript text (used only if Daily events not available)
+                window.mockTranscript = window.mockTranscript || '';
+
+                // Join Daily room if a URL is present
+                (function initDaily(){
+                    const url = window.sessionConfig?.roomUrl;
+                    const container = document.getElementById('call-frame');
+                    if (!url || !container || !window.DailyIframe) return;
+                    try {
+                        const frame = window.DailyIframe.createFrame(container, {
+                            iframeStyle: {
+                                width: '100%',
+                                height: '100%',
+                                minHeight: '320px',
+                                border: '0',
+                                borderRadius: '8px',
+                                overflow: 'hidden'
+                            }
+                        });
+                        frame.join({ url });
+
+                        // Example transcript hook: capture chat messages as transcript lines (fallback if no real transcription)
+                        frame.on('app-message', ev => {
+                            const msg = ev?.data?.message;
+                            if (msg) {
+                                window.dispatchEvent(new CustomEvent('daily-transcript-line', { detail: { speaker: 'Participant', text: String(msg) } }));
+                            }
+                        });
+                    } catch (e) {
+                        console.warn('Daily join failed:', e);
+                    }
+                })();
     </script>
         <script src="{% static 'js/session_simple.js' %}"></script>
     </body>

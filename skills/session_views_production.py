@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
 from django.contrib import messages
+from django.utils.crypto import get_random_string
 
 # Import session models
 from .models import Session, SessionSummary, SessionNotes
@@ -286,6 +287,86 @@ def start_session(request, skill_id=None):
         traceback.print_exc()
         messages.error(request, f"Failed to start session: {str(e)}")
         return redirect('search_results')
+
+
+def start_demo_session(request):
+    """Route all demo calls to a fixed Daily.co room name."""
+    try:
+        daily_api = DailyAPI()
+        demo_room = getattr(settings, 'DAILY_DEMO_ROOM', 'demo-room')
+        # Don't call API for an existing fixed room; construct URL directly
+        room_data = {
+            'name': demo_room,
+            'url': f"https://{daily_api.domain}/{demo_room}",
+            'id': 'demo-fixed-id'
+        }
+
+        room_name = demo_room
+        session_id = None
+        user_name = request.user.get_full_name() or request.user.username if request.user.is_authenticated else 'Guest User'
+
+        context = {
+            'session_id': session_id,
+            'room_name': room_name,
+            'daily_room_url': room_data['url'],
+            'session_title': f"Demo Session - {room_name}",
+            'user_name': user_name,
+            'gemini_api_key': getattr(settings, 'GEMINI_API_KEY', None)
+        }
+        return render(request, 'skills/session.html', context)
+    except Exception as e:
+        messages.error(request, f"Failed to start demo session: {e}")
+        return redirect('search_results')
+
+
+def join_session_page(request):
+    """Render a simple page to enter/join a session by code or create one."""
+    return render(request, 'skills/join_session.html')
+
+
+@require_http_methods(["POST"]) 
+@csrf_exempt
+def join_session_submit(request):
+    """Accept a code; if provided, join that Daily room; else create a new code and redirect."""
+    try:
+        data = request.POST or json.loads(request.body or '{}')
+        code = (data.get('code') or '').strip()
+        daily_api = DailyAPI()
+
+        if code:
+            # Normalize code
+            room_name = code.lower().replace(' ', '-')
+            room_url = f"https://{daily_api.domain}/{room_name}"
+        else:
+            # Generate a human-friendly code
+            code = get_random_string(3).lower() + '-' + get_random_string(4).lower()
+            room_name = f"bmbrain-{code}"
+            # Create the room (mock or real)
+            room = daily_api.create_room(room_name)
+            room_url = room['url']
+
+        # Create session record for authenticated users only
+        session_id = None
+        if request.user.is_authenticated:
+            session = Session.objects.create(
+                user=request.user,
+                room_name=room_name,
+                room_url=room_url,
+                status='active'
+            )
+            session_id = session.id
+
+        context = {
+            'session_id': session_id,
+            'room_name': room_name,
+            'daily_room_url': room_url,
+            'session_title': f"Learning Session - {room_name}",
+            'user_name': request.user.get_full_name() or request.user.username if request.user.is_authenticated else 'Guest User',
+            'gemini_api_key': getattr(settings, 'GEMINI_API_KEY', None)
+        }
+        return render(request, 'skills/session.html', context)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
 
 
 @require_http_methods(["POST"])

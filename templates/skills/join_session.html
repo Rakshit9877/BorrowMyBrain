@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Join a Session - BorrowMyBrain{% endblock %}
+
+{% block content %}
+<section class="section" style="padding: 3rem 0;">
+  <div class="container" style="max-width: 700px;">
+    <h1 class="mb-3">Join or Create a Video Session</h1>
+    <p class="mb-4">Enter a shared code to join the same room as the other participant, or generate a new code and share it.</p>
+
+    <div class="card" style="padding: 1.5rem;">
+      <form method="post" action="{% url 'join_session_submit' %}">
+        {% csrf_token %}
+        <label for="code" class="form-label">Session code</label>
+        <input id="code" name="code" class="form-control" placeholder="e.g. demo-room or bmbrain-abc-1234" />
+        <div class="d-flex gap-2 mt-3">
+          <button class="btn btn-primary" type="submit">Join with code</button>
+          <button class="btn btn-outline" type="button" id="genCode">Generate new code</button>
+          <a class="btn btn-secondary" href="{% url 'start_demo_session' %}">Join demo room</a>
+        </div>
+      </form>
+      <p class="mt-3 small text-muted">Tip: Both users must enter the same room code to connect.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.getElementById('genCode').addEventListener('click', async () => {
+    // Submit empty code to generate a new one server-side
+    const form = document.querySelector('form');
+    const codeInput = document.getElementById('code');
+    codeInput.value = '';
+    form.submit();
+  });
+</script>
+{% endblock %}
