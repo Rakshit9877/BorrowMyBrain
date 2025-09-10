@@ -2,6 +2,335 @@
 {% load static %}
 
 {% block title %}Search Results - BorrowMyBrain{% endblock %}
+{% block body_class %}search-page{% endblock %}
+
+{% block content %}
+<!-- Search Header -->
+<section class="search-header section-light">
+    <div class="container">
+        <!-- Temporary Test Session Link -->
+        <div style="background: #A435F0; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; text-align: center;">
+            <h3 style="margin: 0 0 0.5rem 0;">🎥 Test Video Call Session</h3>
+            <p style="margin: 0 0 1rem 0;">Click below to test the new video call and AI summary features!</p>
+            <a href="{% url 'start_session' %}" class="btn" style="background: white; color: #A435F0; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 6px; font-weight: 600;">
+                Start Test Session
+            </a>
+        </div>
+        
+        <div class="search-header-content">
+            <h1 class="search-title animate-fade-in-up">
+                Discover Amazing Skills
+                <span class="gradient-text">Worldwide</span>
+            </h1>
+            <p class="search-subtitle animate-fade-in-up">
+                Find the perfect educator or skill to accelerate your learning journey
+            </p>
+            
+            <!-- Advanced Search Form -->
+            <form class="search-form animate-scale-in" method="GET" action="{% url 'search_results' %}">
+                <div class="search-input-group">
+                    <div class="search-field">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" 
+                               name="q" 
+                               class="search-input" 
+                               placeholder="What would you like to learn?"
+                               value="{{ request.GET.q }}">
+                    </div>
+                    
+                    <div class="search-field">
+                        <i class="fas fa-map-marker-alt search-icon"></i>
+                        <input type="text" 
+                               name="location" 
+                               class="search-input" 
+                               placeholder="Location (optional)"
+                               value="{{ request.GET.location }}">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary search-btn">
+                        <i class="fas fa-search"></i>
+                        Search
+                    </button>
+                </div>
+                
+                <!-- Advanced Filters -->
+                <div class="search-filters">
+                    <div class="filter-group">
+                        <select name="proficiency" class="filter-select">
+                            <option value="">All Levels</option>
+                            <option value="beginner" {% if request.GET.proficiency == 'beginner' %}selected{% endif %}>Beginner</option>
+                            <option value="intermediate" {% if request.GET.proficiency == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                            <option value="advanced" {% if request.GET.proficiency == 'advanced' %}selected{% endif %}>Advanced</option>
+                            <option value="expert" {% if request.GET.proficiency == 'expert' %}selected{% endif %}>Expert</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <select name="sort" class="filter-select">
+                            <option value="">Sort by</option>
+                            <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>Highest Rated</option>
+                            <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                            <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                            <option value="experience" {% if request.GET.sort == 'experience' %}selected{% endif %}>Most Experienced</option>
+                        </select>
+                    </div>
+                    
+                    <button type="button" class="filter-toggle btn btn-outline-small" id="advancedFilters">
+                        <i class="fas fa-sliders-h"></i> More Filters
+                    </button>
+                </div>
+                
+                <!-- Collapsible Advanced Filters -->
+                <div class="advanced-filters-panel" id="advancedFiltersPanel">
+                    <div class="filter-grid">
+                        <div class="filter-item">
+                            <label class="filter-label">Price Range</label>
+                            <div class="price-range">
+                                <input type="number" name="min_price" placeholder="Min ₹" class="price-input" value="{{ request.GET.min_price }}">
+                                <span class="price-separator">to</span>
+                                <input type="number" name="max_price" placeholder="Max ₹" class="price-input" value="{{ request.GET.max_price }}">
+                            </div>
+                        </div>
+                        
+                        <div class="filter-item">
+                            <label class="filter-label">Availability</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="availability" value="weekdays" {% if 'weekdays' in request.GET.availability %}checked{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Weekdays
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="availability" value="weekends" {% if 'weekends' in request.GET.availability %}checked{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Weekends
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-item">
+                            <label class="filter-label">Teaching Method</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="method" value="online" {% if 'online' in request.GET.method %}checked{% endif %}>
+                                    <span class="checkmark"></span>
+                                    Online
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="method" value="in_person" {% if 'in_person' in request.GET.method %}checked{% endif %}>
+                                    <span class="checkmark"></span>
+                                    In Person
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Categories -->
+<section class="quick-categories">
+    <div class="container">
+        <div class="categories-scroll">
+            <a href="?category=programming" class="category-chip {% if request.GET.category == 'programming' %}active{% endif %}">
+                <i class="fas fa-code"></i> Programming
+            </a>
+            <a href="?category=languages" class="category-chip {% if request.GET.category == 'languages' %}active{% endif %}">
+                <i class="fas fa-language"></i> Languages
+            </a>
+            <a href="?category=music" class="category-chip {% if request.GET.category == 'music' %}active{% endif %}">
+                <i class="fas fa-music"></i> Music
+            </a>
+            <a href="?category=design" class="category-chip {% if request.GET.category == 'design' %}active{% endif %}">
+                <i class="fas fa-palette"></i> Design
+            </a>
+            <a href="?category=business" class="category-chip {% if request.GET.category == 'business' %}active{% endif %}">
+                <i class="fas fa-briefcase"></i> Business
+            </a>
+            <a href="?category=fitness" class="category-chip {% if request.GET.category == 'fitness' %}active{% endif %}">
+                <i class="fas fa-dumbbell"></i> Fitness
+            </a>
+            <a href="?category=cooking" class="category-chip {% if request.GET.category == 'cooking' %}active{% endif %}">
+                <i class="fas fa-utensils"></i> Cooking
+            </a>
+            <a href="?category=photography" class="category-chip {% if request.GET.category == 'photography' %}active{% endif %}">
+                <i class="fas fa-camera"></i> Photography
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Search Results -->
+<section class="search-results section">
+    <div class="container">
+        <div class="results-header">
+            <div class="results-info">
+                {% if request.GET.q %}
+                    <h2 class="results-title">
+                        Search results for "<span class="search-term">{{ request.GET.q }}</span>"
+                    </h2>
+                    <p class="results-count">{{ educators.count }} educator{{ educators.count|pluralize }} found</p>
+                {% else %}
+                    <h2 class="results-title">All Available Skills</h2>
+                    <p class="results-count">{{ educators.count }} educator{{ educators.count|pluralize }} available</p>
+                {% endif %}
+            </div>
+            
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="grid">
+                    <i class="fas fa-th-large"></i>
+                </button>
+                <button class="view-btn" data-view="list">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+        
+        {% if educators %}
+            <div class="skills-grid" id="skillsContainer">
+                {% for educator in educators %}
+                <div class="skill-card card card-elevated animate-fade-in-up" data-skill-id="{{ educator.id }}">
+                    <div class="skill-card-header">
+                        <div class="educator-info">
+                            {% if educator.profile_picture %}
+                                <img src="{{ educator.profile_picture.url }}" 
+                                     alt="{{ educator.user.get_full_name }}" 
+                                     class="profile-img profile-img-medium">
+                            {% else %}
+                                <div class="profile-placeholder profile-img-medium">
+                                    {{ educator.user.first_name.0|default:educator.user.username.0|upper }}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="educator-details">
+                                <h3 class="educator-name">
+                                    {{ educator.user.get_full_name|default:educator.user.username }}
+                                </h3>
+                                <div class="educator-meta">
+                                    <div class="rating">
+                                        <div class="stars">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= educator.rating %}
+                                                    <i class="fas fa-star"></i>
+                                                {% else %}
+                                                    <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <span class="rating-text">({{ educator.rating }})</span>
+                                    </div>
+                                    {% if educator.location %}
+                                        <span class="location">
+                                            <i class="fas fa-map-marker-alt"></i> {{ educator.location }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="skill-actions">
+                            <button class="btn-icon heart-btn" data-skill-id="{{ educator.id }}">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            {% if educator.hourly_rate %}
+                                <div class="price-badge">
+                                    <span class="currency">₹</span>{{ educator.hourly_rate }}<span class="period">/hr</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="skill-card-body">
+                        <h4 class="skill-title">
+                            {% if educator.teachable_skills.all %}
+                                {% for skill in educator.teachable_skills.all|slice:":1" %}{{ skill.skill.name }}{% endfor %}
+                                {% if educator.teachable_skills.count > 1 %}
+                                    <span class="more-skills">+{{ educator.teachable_skills.count|add:"-1" }} more</span>
+                                {% endif %}
+                            {% else %}
+                                Professional Educator
+                            {% endif %}
+                        </h4>
+                        
+                        <div class="skill-tags">
+                            {% for skill in educator.teachable_skills.all|slice:":3" %}
+                                <span class="skill-tag proficiency-{{ skill.proficiency_level }}">
+                                    {{ skill.proficiency_level|title }}
+                                </span>
+                            {% endfor %}
+                            {% if educator.is_verified %}
+                                <span class="skill-tag verified">
+                                    <i class="fas fa-check-circle"></i> Verified
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        {% if educator.bio %}
+                            <p class="skill-description">
+                                {{ educator.bio|truncatewords:20 }}
+                            </p>
+                        {% endif %}
+                        
+                        <div class="skill-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-users"></i>
+                                <span>{{ educator.students_taught|default:0 }} students</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-clock"></i>
+                                <span>{{ educator.response_time|default:"Quick" }} response</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-card-footer">
+                        <a href="{% url 'view_profile' educator.user.id %}" 
+                           class="btn btn-primary skill-cta">
+                            <i class="fas fa-arrow-right"></i> View Profile
+                        </a>
+                        <button class="btn btn-outline contact-btn" data-educator="{{ educator.user.username }}">
+                            <i class="fas fa-comments"></i> Contact
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Load More Button -->
+            <div class="load-more-section text-center">
+                <button class="btn btn-outline btn-large load-more-btn">
+                    <i class="fas fa-plus"></i> Load More Skills
+                </button>
+            </div>
+        {% else %}
+            <div class="empty-results">
+                <div class="empty-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>No educators found</h3>
+                {% if request.GET.q %}
+                    <p>We couldn't find any educators matching "<strong>{{ request.GET.q }}</strong>". Try adjusting your search or browse all skills.</p>
+                    <div class="empty-actions">
+                        <a href="{% url 'search_results' %}" class="btn btn-primary">
+                            <i class="fas fa-list"></i> Browse All Skills
+                        </a>
+                        <a href="{% url 'profile' %}" class="btn btn-outline">
+                            <i class="fas fa-plus"></i> Share Your Skill
+                        </a>
+                    </div>
+                {% else %}
+                    <p>No skills have been shared yet. Be the first to share your expertise!</p>
+                    <a href="{% url 'profile' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Share Your First Skill
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+>>>>>>> 97540dd (WIP: local changes before pulling)
 
 {% block extra_css %}
 <style>

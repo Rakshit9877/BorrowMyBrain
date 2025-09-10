@@ -308,3 +308,8 @@ def make_skill_request(request, teachable_skill_id):
         'teachable_skill': teachable_skill,
     }
     return render(request, 'skills/request_skill.html', context)
+
+
+def test_session_page(request):
+    """Test page for session functionality"""
+    return render(request, 'skills/test_session.html')

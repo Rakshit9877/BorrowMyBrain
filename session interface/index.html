@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Sharing Session</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="session-container">
+        <header class="session-header">
+            <div class="logo">SkillShare</div>
+            <div class="session-info">
+                <span class="session-title">Live Session: Web Development Basics</span>
+                <span class="session-timer" id="timer">00:00:00</span>
+            </div>
+            <div class="user-profile">
+                <img src="https://i.pravatar.cc/40?u=user" alt="User Avatar">
+                <span>Your Name</span>
+            </div>
+        </header>
+
+        <main class="session-main">
+            <div class="video-area">
+                <div class="video-wrapper remote-video-wrapper">
+                    <video id="remoteVideo" autoplay playsinline></video>
+                    <div class="user-name-tag">Tutor Name</div>
+                </div>
+                <div class="video-wrapper local-video-wrapper">
+                    <video id="localVideo" autoplay playsinline muted></video>
+                     <div class="user-name-tag">Your Name</div>
+                </div>
+            </div>
+            <div class="right-panel">
+                <div class="transcription-area">
+                    <h3>Live Transcript</h3>
+                    <div id="transcript-container">
+                        <p class="transcript-placeholder">Transcription will appear here...</p>
+                    </div>
+                </div>
+                <div class="summary-area">
+                    <h3>Session Summary</h3>
+                    <div id="summary-container">
+                        <p class="summary-placeholder">Click "Get Summary" to generate a session summary.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="session-controls">
+            <div class="control-group">
+                <button class="control-button" id="micBtn"><i class="fas fa-microphone"></i></button>
+                <button class="control-button" id="videoBtn"><i class="fas fa-video"></i></button>
+                <button class="control-button" id="shareScreenBtn"><i class="fas fa-desktop"></i></button>
+            </div>
+            <div class="control-group">
+                 <button class="control-button primary" id="getSummaryBtn">Get Summary</button>
+            </div>
+            <div class="control-group">
+                <button class="control-button leave-btn" id="leaveBtn"><i class="fas fa-phone-slash"></i></button>
+            </div>
+        </footer>
+    </div>
+
+    <div id="summaryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Session Summary</h2>
+            <div id="modal-summary-text"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

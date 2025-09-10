@@ -1,0 +1,22 @@
+# Existing requirements
+Django==4.2.7
+
+# Video calling and session management
+requests==2.31.0
+
+# Google Cloud services for transcription and storage
+google-cloud-speech==2.21.0
+google-cloud-storage==2.10.0
+
+# AI/ML for summaries
+google-generativeai==0.3.2
+
+# Audio/video processing
+ffmpeg-python==0.2.0
+
+# Additional utilities
+python-decouple==3.8  # For environment variables
+Pillow==10.0.1  # For image handling
+
+# Optional: If you want to use Vertex AI instead of direct Gemini API
+# google-cloud-aiplatform==1.38.1

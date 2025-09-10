@@ -130,3 +130,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# API Keys for session functionality
+GEMINI_API_KEY = 'AIzaSyBCUMFbxVUEDyBeDZtd0xZZKL-3uCeJiaI'
+DAILY_API_KEY = None  # Add your Daily.co API key here if needed
+DAILY_DOMAIN = 'test-domain.daily.co'

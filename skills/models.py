@@ -132,3 +132,62 @@ class SkillRequest(models.Model):
 
     def __str__(self):
         return f"{self.learner.username} -> {self.educator.username} ({self.requested_skill.skill.name})"
+
+
+class Session(models.Model):
+    """Learning session between users"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sessions')
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, blank=True, null=True)
+    room_name = models.CharField(max_length=200, unique=True)
+    room_url = models.URLField()
+    status = models.CharField(max_length=20, choices=[
+        ('active', 'Active'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ], default='active')
+    started_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Session {self.room_name} - {self.user.username}"
+
+
+class SessionRecording(models.Model):
+    """Recording information for sessions"""
+    session = models.OneToOneField(Session, on_delete=models.CASCADE, related_name='recording')
+    recording_id = models.CharField(max_length=200)
+    download_url = models.URLField()
+    gcs_uri = models.CharField(max_length=500, blank=True, null=True)
+    file_size = models.BigIntegerField(blank=True, null=True)
+    duration = models.DurationField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Recording for {self.session.room_name}"
+
+
+class SessionSummary(models.Model):
+    """AI-generated session summaries"""
+    session = models.OneToOneField(Session, on_delete=models.CASCADE, related_name='summary')
+    transcript = models.TextField()
+    summary = models.TextField()
+    language = models.CharField(max_length=10, default='hi', choices=[
+        ('hi', 'Hindi'),
+        ('en', 'English'),
+    ])
+    generated_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Summary for {self.session.room_name}"
+
+
+class SessionNotes(models.Model):
+    """User notes during sessions"""
+    session = models.OneToOneField(Session, on_delete=models.CASCADE, related_name='notes')
+    notes = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Notes for {self.session.room_name}"

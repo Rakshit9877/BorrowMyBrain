@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import session_views_production as session_views
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -12,4 +13,14 @@ urlpatterns = [
     path('search/', views.search_results, name='search_results'),
     path('educator/<int:user_id>/', views.view_profile, name='view_profile'),
     path('request/<int:teachable_skill_id>/', views.make_skill_request, name='make_skill_request'),
+    
+    # Session URLs
+    path('session/start/', session_views.start_session, name='start_session'),
+    path('session/start/<int:skill_id>/', session_views.start_session, name='start_session_with_skill'),
+    path('session/test/', views.test_session_page, name='test_session_page'),
+    
+    # Session API endpoints
+    path('api/generate-summary/', session_views.generate_summary_api, name='generate_summary_api'),
+    path('api/process-recording/', session_views.process_recording_api, name='process_recording_api'),
+    path('api/save-session-notes/', session_views.save_session_notes_api, name='save_session_notes_api'),
 ]

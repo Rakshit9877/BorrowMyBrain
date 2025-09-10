@@ -1,0 +1,155 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BorrowMyBrain - Live Session</title>
+    <link rel="stylesheet" href="{% static 'css/session.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://unpkg.com/@daily-co/daily-js"></script>
+</head>
+<body>
+    <div class="session-container">
+        <header class="session-header">
+            <div class="logo">
+                <a href="{% url 'home' %}">BorrowMy<span class="brain-highlight">Brain</span></a>
+            </div>
+            <div class="session-info">
+                <span class="session-title">{{ session_title|default:"Live Learning Session" }}</span>
+                <span class="session-timer" id="timer">00:00:00</span>
+            </div>
+            <div class="user-profile">
+                <img src="https://i.pravatar.cc/40?u={{ user.username }}" alt="User Avatar">
+                <span>{{ user.get_full_name|default:user.username }}</span>
+            </div>
+        </header>
+
+        <main class="session-main">
+            <div class="video-area">
+                <!-- Mock video area for testing -->
+                <div id="call-frame" class="daily-call-frame" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem;">
+                    <div style="text-align: center;">
+                        <i class="fas fa-video" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
+                        <div>Mock Video Session</div>
+                        <div style="font-size: 0.9rem; opacity: 0.8;">Testing AI Summary Feature</div>
+                    </div>
+                </div>
+                <div class="video-controls">
+                    <div class="control-group">
+                        <button class="control-button" id="micBtn"><i class="fas fa-microphone"></i></button>
+                        <button class="control-button" id="videoBtn"><i class="fas fa-video"></i></button>
+                        <button class="control-button" id="shareScreenBtn"><i class="fas fa-desktop"></i></button>
+                    </div>
+                    <div class="control-group">
+                        <button class="control-button primary" id="getSummaryBtn">Get AI Summary</button>
+                        <button class="control-button" id="recordBtn"><i class="fas fa-record-vinyl"></i></button>
+                    </div>
+                    <div class="control-group">
+                        <button class="control-button leave-btn" id="leaveBtn"><i class="fas fa-phone-slash"></i></button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <div class="transcription-area">
+                    <div class="section-header">
+                        <h3>Live Transcript</h3>
+                        <button class="toggle-btn" id="toggleTranscript">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                    </div>
+                    <div id="transcript-container" class="content-container">
+                        <p class="transcript-placeholder">Transcription will appear here once the session starts...</p>
+                    </div>
+                </div>
+                
+                <div class="summary-area">
+                    <div class="section-header">
+                        <h3>AI Session Summary</h3>
+                        <button class="toggle-btn" id="toggleSummary">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                    </div>
+                    <div id="summary-container" class="content-container">
+                        <p class="summary-placeholder">Click "Get AI Summary" to generate an intelligent session summary.</p>
+                        <div id="summary-loading" class="loading-spinner" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Generating AI summary...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="session-notes">
+                    <div class="section-header">
+                        <h3>Session Notes</h3>
+                        <button class="toggle-btn" id="toggleNotes">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                    </div>
+                    <div class="content-container">
+                        <textarea id="notesArea" placeholder="Take notes during the session..."></textarea>
+                        <button class="save-notes-btn" id="saveNotesBtn">Save Notes</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Summary Modal -->
+    <div id="summaryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>AI-Generated Session Summary</h2>
+                <span class="close-button">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="modal-summary-text"></div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="downloadSummaryBtn">Download Summary</button>
+                    <button class="btn btn-secondary" id="shareSummaryBtn">Share Summary</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connection Status -->
+    <div id="connectionStatus" class="connection-status">
+        <div class="status-indicator">
+            <i class="fas fa-circle"></i>
+            <span>Connecting...</span>
+        </div>
+    </div>
+
+    <script>
+        // Pass Django context variables to JavaScript
+        window.sessionConfig = {
+            roomUrl: "{{ daily_room_url }}",
+            roomName: "{{ room_name }}",
+            userId: "{{ user.id|default:'guest' }}",
+            userName: "{{ user_name|default:'Guest User' }}",
+            sessionId: "{{ session_id|default:'' }}",
+            csrfToken: "{{ csrf_token }}",
+            geminiApiKey: "{{ gemini_api_key|default:'' }}"
+        };
+        
+        // Mock transcript data for immediate testing
+        window.mockTranscript = `Teacher: Welcome to this learning session! Today we'll be covering Python programming fundamentals.
+Student: That sounds great! I'm excited to learn about variables and functions in Python.
+Teacher: Let's start with variables. In Python, you can create a variable by simply assigning a value to it. For example: name = 'John'
+Student: I see! So Python automatically determines the data type? That's different from Java.
+Teacher: Exactly! Python is dynamically typed. Now let's talk about functions. Functions in Python are defined using the 'def' keyword.
+Student: Can you show me an example of a simple function?
+Teacher: Sure! Here's a simple function: def greet(name): return f'Hello, {name}!' This function takes a name parameter and returns a greeting.
+Student: That's really helpful! How do I call this function?
+Teacher: You simply call it like this: greet('Alice') and it will return 'Hello, Alice!'
+Student: Perfect! This makes so much sense. Can functions return multiple values?
+Teacher: Yes! In Python, you can return multiple values as a tuple. For example: def get_name_age(): return 'John', 25
+Student: Wow, Python is so flexible! What about loops? How do they work?
+Teacher: Great question! Python has for loops and while loops. A simple for loop looks like: for i in range(5): print(i)
+Student: That's much cleaner than Java syntax. I love how readable Python is!
+Teacher: Exactly! Python emphasizes readability and simplicity. That's why it's great for beginners and professionals alike.`;
+    </script>
+        <script src="{% static 'js/session_simple.js' %}"></script>
+    </body>
+</html>

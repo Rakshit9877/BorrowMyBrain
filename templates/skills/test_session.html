@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Session Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .button { background: #A435F0; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🎯 Session Interface Test</h1>
+    
+    <div class="test-section">
+        <h2>✅ Quick Test Links</h2>
+        <p>Click these links to test the session interface:</p>
+        <a href="/session/start/" class="button">🚀 Direct Session Start</a>
+        <a href="/search/" class="button">🔍 Search Page (with test button)</a>
+    </div>
+    
+    <div class="test-section">
+        <h2>📋 Expected Behavior</h2>
+        <ol>
+            <li><strong>Click any link above</strong> - Should redirect to session interface</li>
+            <li><strong>Mock transcript loads</strong> - Conversation about Python programming appears</li>
+            <li><strong>Click "Get AI Summary"</strong> - Real AI summary generates in 3-5 seconds</li>
+            <li><strong>Summary displays</strong> - Both in right panel and modal popup</li>
+        </ol>
+    </div>
+    
+    <div class="test-section success">
+        <h2>🎉 Current Status: WORKING</h2>
+        <ul>
+            <li>✅ Session interface is functional</li>
+            <li>✅ Mock transcript pre-loaded</li>
+            <li>✅ Gemini AI integration active</li>
+            <li>✅ No login required (temporary)</li>
+        </ul>
+    </div>
+    
+    <script>
+        // Auto-redirect to session after 3 seconds if URL has test parameter
+        if (window.location.search.includes('autotest=true')) {
+            setTimeout(() => {
+                window.location.href = '/session/start/';
+            }, 3000);
+            document.body.innerHTML += '<div style="position: fixed; top: 0; left: 0; right: 0; background: #A435F0; color: white; padding: 10px; text-align: center;">🚀 Auto-redirecting to session in 3 seconds...</div>';
+        }
+    </script>
+</body>
+</html>
