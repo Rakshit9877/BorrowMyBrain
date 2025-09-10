@@ -43,6 +43,10 @@ class DailyAPI:
                 'url': f"https://{self.domain}/{room_name}",
                 'id': str(uuid.uuid4())
             }
+
+    def room_url_for(self, room_name: str):
+        """Return a room URL for an existing/fixed room name (no API call)."""
+        return f"https://{self.domain}/{room_name}"
         
         # Real Daily.co integration (when API key is available)
         if not exp_time:
@@ -286,6 +290,73 @@ def start_session(request, skill_id=None):
         import traceback
         traceback.print_exc()
         messages.error(request, f"Failed to start session: {str(e)}")
+        return redirect('search_results')
+
+
+def start_demo_session(request):
+    """Join a fixed demo room so any click connects to the same call."""
+    try:
+        demo_room = getattr(settings, 'DAILY_DEMO_ROOM', 'demo-room')
+        daily_api = DailyAPI()
+        room_url = daily_api.room_url_for(demo_room)
+
+        # Optional: create a temporary session record for authenticated users
+        session_id = None
+        if request.user.is_authenticated:
+            session = Session.objects.create(
+                user=request.user,
+                room_name=demo_room,
+                room_url=room_url,
+                status='active'
+            )
+            session_id = session.id
+
+        context = {
+            'session_id': session_id,
+            'room_name': demo_room,
+            'daily_room_url': room_url,
+            'session_title': f"Demo Session - {demo_room}",
+            'user_name': request.user.get_full_name() if request.user.is_authenticated else 'Guest User',
+            'gemini_api_key': getattr(settings, 'GEMINI_API_KEY', None)
+        }
+        return render(request, 'skills/session.html', context)
+    except Exception as e:
+        messages.error(request, f"Failed to join demo session: {str(e)}")
+        return redirect('search_results')
+
+
+def start_session_by_code(request, room_code: str):
+    """Join a session by entering a shared room code (both users enter same code)."""
+    try:
+        daily_api = DailyAPI()
+        room_name = room_code.strip()
+        if not room_name:
+            messages.error(request, 'Invalid room code')
+            return redirect('search_results')
+
+        room_url = daily_api.room_url_for(room_name)
+
+        session_id = None
+        if request.user.is_authenticated:
+            session = Session.objects.create(
+                user=request.user,
+                room_name=room_name,
+                room_url=room_url,
+                status='active'
+            )
+            session_id = session.id
+
+        context = {
+            'session_id': session_id,
+            'room_name': room_name,
+            'daily_room_url': room_url,
+            'session_title': f"Session - {room_name}",
+            'user_name': request.user.get_full_name() if request.user.is_authenticated else 'Guest User',
+            'gemini_api_key': getattr(settings, 'GEMINI_API_KEY', None)
+        }
+        return render(request, 'skills/session.html', context)
+    except Exception as e:
+        messages.error(request, f"Failed to join session: {str(e)}")
         return redirect('search_results')
 
 

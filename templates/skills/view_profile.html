@@ -762,4 +762,59 @@ document.addEventListener('keydown', function(event) {
     }
 });
 </script>
+<!-- Contact / Offer Modal (appended to enable #offer deep link) -->
+<div id="contact-modal" class="d-none" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5);">
+    <div class="modal-content" style="background:#fff; border-radius:10px; max-width:560px; margin: 5% auto; padding: 1rem;">
+        <div class="modal-header">
+            <h3 id="modal-title">Make Payment Offer</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            {% if teachable_skills %}
+            <form id="payment-offer-form" class="d-none" method="post" action="{% url 'make_skill_request' teachable_skills.first.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="request_type" value="payment" />
+                <input type="hidden" name="next" value="{% url 'start_demo_session' %}" />
+                <div class="form-group mb-3">
+                    <label>Offer Amount (₹)</label>
+                    <input type="number" name="offered_amount" class="form-control" min="0" step="1" required />
+                </div>
+                <div class="form-group mb-3">
+                    <label>Message</label>
+                    <textarea name="message" class="form-control" placeholder="Add a short note..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Offer & Start Demo Session</button>
+            </form>
+
+            <form id="skill-exchange-form" class="d-none" method="post" action="{% url 'make_skill_request' teachable_skills.first.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="request_type" value="exchange" />
+                <input type="hidden" name="next" value="{% url 'start_demo_session' %}" />
+                <div class="form-group mb-3">
+                    <label>Your Skill Offer</label>
+                    <input type="text" name="offered_skill" class="form-control" placeholder="e.g., I can teach Photoshop..." required />
+                </div>
+                <div class="form-group mb-3">
+                    <label>Message</label>
+                    <textarea name="message" class="form-control" placeholder="Add a short note..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Propose Exchange & Start Demo Session</button>
+            </form>
+            {% else %}
+            <p class="text-muted">This educator hasn't listed skills yet.</p>
+            {% endif %}
+            <div class="mt-3">
+                <a class="btn btn-outline" href="{% url 'start_demo_session' %}">Join Demo Room Now</a>
+                <a class="btn btn-outline" href="{% url 'start_session_by_code' 'demo-room' %}">Join by Code: demo-room</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-open modal when URL has #offer
+if (window.location.hash === '#offer') {
+    showPaymentOffer();
+}
+</script>
 {% endblock %}

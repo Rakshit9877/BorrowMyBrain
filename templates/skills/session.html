@@ -28,6 +28,7 @@
         <main class="session-main">
             <div class="video-area">
                 <div id="call-frame" class="daily-call-frame" style="background: #111; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; min-height: 320px;"></div>
+                    <div id="call-frame" class="daily-call-frame" style="width:100%; height:100%; background:#000;"></div>
                 <div class="video-controls">
                     <div class="control-group">
                         <button class="control-button" id="micBtn"><i class="fas fa-microphone"></i></button>
@@ -159,6 +160,66 @@
                     }
                 })();
     </script>
+                // Minimal Daily join + speech recognition using browser API
+                (function(){
+                    const frameEl = document.getElementById('call-frame');
+                    const roomUrl = window.sessionConfig?.roomUrl;
+                    const statusEl = document.getElementById('connectionStatus');
+                    let callFrame;
+                    function setStatus(cls, msg){
+                        if(!statusEl) return;
+                        statusEl.className = `connection-status ${cls}`;
+                        statusEl.innerHTML = `<div class="status-indicator"><i class="fas fa-circle"></i><span>${msg}</span></div>`;
+                    }
+                    if (window.DailyIframe && roomUrl) {
+                        try {
+                            setStatus('connecting','Connecting to session...');
+                            callFrame = window.DailyIframe.createFrame(frameEl, {showLeaveButton:false, showFullscreenButton:false});
+                            callFrame.on('joined-meeting', ()=> setStatus('connected','Connected'))
+                                             .on('left-meeting', ()=> setStatus('disconnected','Disconnected'))
+                                             .on('error', ()=> setStatus('disconnected','Connection error'));
+                            callFrame.join({ url: roomUrl });
+                        } catch(e){ setStatus('disconnected','Failed to connect'); }
+                    }
+
+                    // Basic live transcription via Web Speech API (browser-side)
+                    const transcriptContainer = document.getElementById('transcript-container');
+                    const timerEl = document.getElementById('timer');
+                    function addLine(speaker,text){
+                        const el=document.createElement('div');
+                        el.className='transcript-entry';
+                        el.innerHTML = `<div class="transcript-speaker">${speaker}</div><div class="transcript-text">${text}</div>`;
+                        transcriptContainer.appendChild(el);
+                        transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+                    }
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    if (SpeechRecognition){
+                        const rec = new SpeechRecognition();
+                        rec.continuous = true; rec.interimResults = true; rec.lang = 'en-IN';
+                        let bufferFinal = '';
+                        rec.onresult = (e)=>{
+                            let interim='';
+                            for(let i=e.resultIndex;i<e.results.length;i++){
+                                const tx = e.results[i][0].transcript;
+                                if(e.results[i].isFinal){ bufferFinal += tx + '\n'; addLine('You', tx); }
+                                else { interim += tx; }
+                            }
+                            // store transcript for AI summary
+                            window.__fullTranscript = bufferFinal;
+                        };
+                        rec.start();
+                    }
+
+                    // Hook AI Summary button to use collected transcript if available
+                    const btn = document.getElementById('getSummaryBtn');
+                    btn?.addEventListener('click', ()=>{
+                        if (window.__fullTranscript){
+                            // expose for session_simple to pick up
+                            window.mockTranscript = window.__fullTranscript.split('\n').map(t=>`You: ${t}`).join('\n');
+                        }
+                    });
+                })();
+                </script>
         <script src="{% static 'js/session_simple.js' %}"></script>
     </body>
 </html>

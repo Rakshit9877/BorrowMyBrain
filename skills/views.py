@@ -284,6 +284,7 @@ def make_skill_request(request, teachable_skill_id):
     
     if request.method == 'POST':
         request_type = request.POST.get('request_type')
+        next_url = request.POST.get('next')
         
         skill_request = SkillRequest.objects.create(
             learner=request.user,
@@ -302,6 +303,8 @@ def make_skill_request(request, teachable_skill_id):
         skill_request.save()
         
         messages.success(request, 'Your request has been sent to the educator!')
+        if next_url:
+            return redirect(next_url)
         return redirect('view_profile', user_id=teachable_skill.user_profile.user.id)
     
     context = {

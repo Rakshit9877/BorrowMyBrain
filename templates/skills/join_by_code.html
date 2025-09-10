@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Join Session by Code{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:600px;">
+    <h1>Join a Session</h1>
+    <p>Enter the shared room code to join the same Daily.co room.</p>
+    <form method="get" action="" onsubmit="event.preventDefault(); const code=document.getElementById('room_code').value.trim(); if(code){ window.location.href = '/session/room/' + encodeURIComponent(code) + '/'; }">
+      <div class="form-group" style="margin: 1rem 0;">
+        <label for="room_code">Room Code</label>
+        <input id="room_code" name="room_code" class="form-control" placeholder="e.g., demo-room" required />
+      </div>
+      <button class="btn btn-primary" type="submit">Join</button>
+      <a class="btn btn-outline" href="{% url 'start_demo_session' %}">Join Demo Room</a>
+    </form>
+  </div>
+  <div class="container" style="max-width:600px; margin-top:2rem;">
+    <h3>How it works</h3>
+    <ol>
+      <li>Share a short code with the other person (e.g., <strong>demo-room</strong>).</li>
+      <li>Both of you enter the same code here.</li>
+      <li>You’ll join the same Daily.co room and connect.</li>
+    </ol>
+  </div>
+{% endblock %}

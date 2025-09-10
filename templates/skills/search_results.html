@@ -281,17 +281,9 @@
                            class="btn btn-primary skill-cta">
                             <i class="fas fa-arrow-right"></i> View Profile
                         </a>
-                        {% with first_skill=educator.teachable_skills.all|first %}
-                            {% if first_skill %}
-                                <a href="{% url 'make_skill_request' first_skill.id %}" class="btn btn-outline contact-btn">
-                                    <i class="fas fa-handshake"></i> Offer & Start
-                                </a>
-                            {% else %}
-                                <a href="{% url 'join_session_page' %}" class="btn btn-outline contact-btn">
-                                    <i class="fas fa-handshake"></i> Offer & Start
-                                </a>
-                            {% endif %}
-                        {% endwith %}
+                            <a href="{% url 'view_profile' educator.user.id %}#offer" class="btn btn-outline contact-btn">
+                                <i class="fas fa-handshake"></i> Make Offer
+                            </a>
                         <button class="btn btn-outline contact-btn" data-educator="{{ educator.user.username }}">
                             <i class="fas fa-comments"></i> Contact
                         </button>
